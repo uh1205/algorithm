@@ -8,4 +8,3 @@ def solution(n):
             answer += '박'
     
     return answer
-        
