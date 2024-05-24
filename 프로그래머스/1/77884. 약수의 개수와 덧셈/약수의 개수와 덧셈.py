@@ -1,23 +1,8 @@
-def countDivisor(n):
-    if n == 1:
-        return 1
-    
-    count = 2
-    
-    for i in range(2, n):
-        if n % i == 0:
-            count += 1
-            
-    return count
-
-
 def solution(left, right):
-    result = 0
-    
-    for n in range(left, right + 1):
-        if countDivisor(n) % 2 == 0:
-            result += n
+    answer = 0
+    for i in range(left, right + 1):
+        if int(i**0.5) == (i**0.5):
+            answer -= i
         else:
-            result -= n
-            
-    return result
+            answer += i
+    return answer
