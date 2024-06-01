@@ -1,11 +1,16 @@
 def solution(s):
-    res = []
+    answer = ''
+    i = 0
     
-    for x in s.split(' '):
-        word = ''
-        for i in range(len(x)):
-            c = x[i].upper() if i % 2 == 0 else x[i].lower()
-            word = word + c
-        res.append(word)
-        
-    return ' '.join(res)
+    for c in s:
+        if c == ' ':
+            answer += ' '
+            i = 0
+        else:
+            if i % 2 == 0:
+                answer += c.upper()
+            else:
+                answer += c.lower()
+            i += 1
+                
+    return answer
