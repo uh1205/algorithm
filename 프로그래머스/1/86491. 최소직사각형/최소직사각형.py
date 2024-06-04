@@ -1,9 +1,9 @@
 def solution(sizes):
-    w = 0
-    h = 0
+    w, h = 0, 0
     
     for a, b in sizes:
-        a, b = max(a, b), min(a, b)
+        if a < b:
+            a, b = b, a
         if w < a:
             w = a
         if h < b:
