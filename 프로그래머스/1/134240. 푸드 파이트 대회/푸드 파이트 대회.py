@@ -1,8 +1,4 @@
 def solution(food):
-    result = ''
-    
-    for i, v in enumerate(food, 0):
-        if i != 0:
-            result += str(i) * (v // 2)
+    result = ''.join(str(i) * (v // 2) for i, v in enumerate(food))
     
     return result + '0' + result[::-1]
