@@ -1,10 +1,9 @@
 def solution(a, b, n):
     result = 0
-    
-    while n // a:
-        x = n // a
-        n = n - x * a + x * b
+
+    while n >= a:
+        c = n // a * b
+        result += c
+        n = n % a + c
         
-        result += x * b
-    
     return result
