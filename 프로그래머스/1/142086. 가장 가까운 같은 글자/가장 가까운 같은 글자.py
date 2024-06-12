@@ -1,14 +1,11 @@
 def solution(s):
-    r = []
-    l = []
-    cnt = 0
-    
-    for c in s:
-        if c in l:
-            r.append(l.index(c) + 1)
-            l.insert(0, c)
+    answer = []
+    dic = dict()
+    for i in range(len(s)):
+        if s[i] not in dic:
+            answer.append(-1)
         else:
-            r.append(-1)
-            l.insert(0, c)
-        
-    return r
+            answer.append(i - dic[s[i]])
+        dic[s[i]] = i
+
+    return answer
