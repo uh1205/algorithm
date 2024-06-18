@@ -1,9 +1,15 @@
 def solution(cards1, cards2, goal):
+    from collections import deque
+    
+    queue1 = deque(cards1)
+    queue2 = deque(cards2)
+    
     for word in goal:
-        if cards1 and word == cards1[0]:
-            cards1.pop(0)
-        elif cards2 and word == cards2[0]:
-            cards2.pop(0)
+        if queue1 and queue1[0] == word:
+            queue1.popleft()
+        elif queue2 and queue2[0] == word:
+            queue2.popleft()
         else:
-            return 'No'
-    return 'Yes'
+            return "No"
+    
+    return "Yes"
