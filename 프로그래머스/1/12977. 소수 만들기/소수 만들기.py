@@ -1,15 +1,16 @@
-def isprime(num):
-    for i in range(2, num):
-        if num % i == 0:
+from itertools import combinations
+
+def is_prime(n):
+    if n <= 1:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
             return False
     return True
 
 def solution(nums):
-    result = 0
-    from itertools import combinations
-    
+    count = 0
     for t in combinations(nums, 3):
-        if isprime(sum(t)):
-            result += 1
-    
-    return result
+        if is_prime(sum(t)):
+            count += 1
+    return count
