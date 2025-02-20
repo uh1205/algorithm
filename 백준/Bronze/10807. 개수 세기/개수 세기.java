@@ -15,7 +15,7 @@ class Main {
         int result = 0;
         for (int a : arr) {
             if (a == v) {
-                result += 1;
+                result++;
             }
         }
         System.out.println(result);
