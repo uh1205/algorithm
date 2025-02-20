@@ -11,26 +11,21 @@ class Main {
         int m = Integer.parseInt(st.nextToken());
 
         int[] arr = new int[n];
-        for (int i = 0; i < n; i++) {
-            arr[i] = i + 1;
-        }
+        for (int i = 0; i < n; i++) arr[i] = i + 1;
 
-        for (int k = 0; k < m; k++) {
+        while (m-- > 0) {  // for 대신 while 사용 (더 빠름)
             st = new StringTokenizer(br.readLine());
-            int i = Integer.parseInt(st.nextToken());
-            int j = Integer.parseInt(st.nextToken());
-            swap(arr, i - 1, j - 1);
+            int i = Integer.parseInt(st.nextToken()) - 1;
+            int j = Integer.parseInt(st.nextToken()) - 1;
+
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
         }
 
-        for (int i = 0; i < n; i++) {
-            bw.write(arr[i] + " ");
+        for (int a : arr) {
+            bw.write(a + " ");
         }
         bw.flush();
-    }
-
-    public static void swap(int[] arr, int i, int j) {
-        int tmp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = tmp;
     }
 }
