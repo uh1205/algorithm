@@ -19,7 +19,10 @@ public class Main {
         int result = 0;
         for (int[] row : arr) {
             for (int r : row) {
-                result += r;
+//                result += r;
+                if (r == 1) {
+                    result++;
+                }
             }
         }
         System.out.println(result);
