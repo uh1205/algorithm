@@ -16,9 +16,8 @@ public class Main {
                 if (j == K) {
                     System.out.println(i);
                     return;
-                } else {
-                    j++;
                 }
+                j++;
             }
         }
         System.out.println(0);
