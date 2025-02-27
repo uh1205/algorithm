@@ -1,19 +1,18 @@
 import java.io.*;
 
-public class Main {
+class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
-        if (N % 5 == 0) {
-            System.out.println(N / 5);
-            return;
-        }
-        for (int i = N / 5; i >= 0; i--) {
-            int a = N - 5 * i;
-            if (a % 3 == 0) {
-                System.out.println(i + a / 3);
+        int result = 0;
+        while (N >= 0) {
+            if (N % 5 == 0) {
+                result += N / 5;
+                System.out.println(result);
                 return;
             }
+            N -= 3;
+            result++;
         }
         System.out.println(-1);
     }
