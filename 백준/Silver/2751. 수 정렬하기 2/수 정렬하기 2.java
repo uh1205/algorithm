@@ -7,7 +7,7 @@ class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        // -1 000 000 ~ 1 000 000
+        // -1,000,000 ~ 1,000,000
         boolean[] arr = new boolean[2000001];
 
         for (int i = 0; i < N; i++) {
