@@ -21,8 +21,8 @@ class Main {
 
     static void perm(int depth) {
         if (depth == M) {
-            for (int i = 0; i < M; i++) {
-                sb.append(num[i]).append(" ");
+            for (int n : num) {
+                sb.append(n).append(" ");
             }
             sb.append("\n");
             return;
@@ -32,7 +32,6 @@ class Main {
             visited[i] = true;
             num[depth] = i;
             perm(depth + 1);
-            num[depth] = 0;
             visited[i] = false;
         }
     }
