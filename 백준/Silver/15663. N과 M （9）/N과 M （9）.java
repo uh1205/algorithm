@@ -4,9 +4,8 @@ import java.util.*;
 class Main {
 
     static int N, M;
-    static int[] arr;
+    static int[] arr, num;
     static boolean[] visited;
-    static int[] num;
     static List<String> list = new ArrayList<>();
     static StringBuilder sb = new StringBuilder();
 
@@ -29,21 +28,19 @@ class Main {
 
     static void dfs(int depth) {
         if (depth == M) {
-            StringBuilder tmp = new StringBuilder();
-            for (int n : num) {
-                tmp.append(n).append(" ");
+            for (int i = 0; i < M; i++) {
+                sb.append(num[i]).append(" ");
             }
-            String s = String.valueOf(tmp);
-            if (!list.contains(s)) {
-                list.add(s);
-                sb.append(tmp).append("\n");
-            }
+            sb.append("\n");
             return;
         }
+        int lastUsed = -1; // 추가
         for (int i = 0; i < N; i++) {
             if (visited[i]) continue;
+            if (arr[i] == lastUsed) continue;  // 추가
             visited[i] = true;
             num[depth] = arr[i];
+            lastUsed = arr[i];  // 추가
             dfs(depth + 1);
             visited[i] = false;
         }
