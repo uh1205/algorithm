@@ -23,23 +23,21 @@ class Main {
         }
 
         int cnt = 0;
-        Queue<Integer> q = new PriorityQueue<>();
-        for (int r = 0; r < N; r++) {
-            for (int c = 0; c < N; c++) {
-                if (map[r][c]) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>(); // 낮은 값부터 나옴
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (map[i][j]) {
                     cnt++;
-                    q.offer(dfs(r, c));
+                    pq.add(dfs(i, j));
                 }
             }
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append(cnt).append('\n');
-
-        while (!q.isEmpty()) {
-            sb.append(q.poll()).append('\n');
+        while (!pq.isEmpty()) {
+            sb.append(pq.poll()).append('\n');
         }
-
         System.out.print(sb);
     }
 
