@@ -5,7 +5,6 @@ class Main {
 
     static int N, M;
     static int[] nums, targets;
-    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -25,28 +24,17 @@ class Main {
             targets[i] = Integer.parseInt(st.nextToken());
         }
 
+        StringBuilder sb = new StringBuilder();
         for (int target : targets) {
-            search(0, N - 1, target);
+            int result = Arrays.binarySearch(nums, target);
+            if (result < 0) {
+                sb.append(0);
+            } else {
+                sb.append(1);
+            }
+            sb.append('\n');
         }
 
         System.out.println(sb);
-    }
-
-    static void search(int start, int end, int target) {
-        if (start == end) {
-            if (nums[start] == target) {
-                sb.append(1);
-            } else {
-                sb.append(0);
-            }
-            sb.append('\n');
-            return;
-        }
-        int mid = (start + end) / 2;
-        if (nums[mid] < target) {
-            search(mid + 1, end, target);
-        } else {
-            search(start, mid, target);
-        }
     }
 }
