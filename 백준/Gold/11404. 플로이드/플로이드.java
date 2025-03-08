@@ -5,7 +5,7 @@ class Main {
 
     static int n, m, a, b, c;
     static int[][] dist; // 최단 거리 배열
-    static final int INF = 100_000_000; // 무한대를 나타내는 값 (100,000 * 100보다 큼)
+    static final int INF = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
