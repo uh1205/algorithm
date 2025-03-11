@@ -3,7 +3,8 @@ import java.util.*;
 
 public class Main {
 
-    static int N, min = Integer.MAX_VALUE, max = 0, rain, result = 0;
+    static int N, rain, result = 1; // 하나도 안 잠기는 경우
+    static int min = Integer.MAX_VALUE, max = 0;
     static int[][] map;
     static boolean[][] visited;
     static int[] dr = {0, 1, 0, -1};
@@ -24,7 +25,7 @@ public class Main {
             }
         }
 
-        for (rain = min - 1; rain < max; rain++) {
+        for (rain = min; rain < max; rain++) {
             int cnt = 0;
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
