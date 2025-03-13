@@ -21,12 +21,12 @@ public class Main {
         while (r < N && l <= r) {
             int diff = arr[r] - arr[l];
 
-            if (diff < M) {
-                r++;
-            }
+            
             if (diff >= M) {
                 min = Math.min(min, diff);
                 l++;
+            } else {
+                r++;
             }
         }
 
