@@ -1,94 +1,82 @@
 import java.io.*;
 import java.util.*;
 
-class Edge implements Comparable<Edge> {
-
-    int node;
-    int weight;
-
-    public Edge(int node, int weight) {
-        this.node = node;
-        this.weight = weight;
+public class Main {
+    static class Node implements Comparable<Node> {
+        int v, cost;
+        Node(int v, int cost) {
+            this.v = v;
+            this.cost = cost;
+        }
+        public int compareTo(Node o) {
+            return this.cost - o.cost;
+        }
     }
 
-    @Override
-    public int compareTo(Edge o) {
-        return this.weight - o.weight;
+    static int N, M, X;
+    static List<List<Node>> graph;
+    static List<List<Node>> reverseGraph;
+
+    static final int INF = Integer.MAX_VALUE;
+
+    public static int[] dijkstra(List<List<Node>> g, int start) {
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        int[] dist = new int[N + 1];
+        Arrays.fill(dist, INF);
+        dist[start] = 0;
+        pq.offer(new Node(start, 0));
+
+        while (!pq.isEmpty()) {
+            Node cur = pq.poll();
+            int u = cur.v, cost = cur.cost;
+            if (cost > dist[u]) continue;
+
+            for (Node next : g.get(u)) {
+                int v = next.v, newCost = cost + next.cost;
+                if (newCost < dist[v]) {
+                    dist[v] = newCost;
+                    pq.offer(new Node(v, newCost));
+                }
+            }
+        }
+        return dist;
     }
-}
-
-class Main {
-
-    static int N, M, X, max = 0;
-    static List<List<Edge>> graph;
-    static int[] distance, time;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken()); // 학생 수
-        M = Integer.parseInt(st.nextToken()); // 도로 수
-        X = Integer.parseInt(st.nextToken()); // 파티하는 마을
+
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        X = Integer.parseInt(st.nextToken());
 
         graph = new ArrayList<>();
-        for (int i = 0; i < N + 1; i++) {
+        reverseGraph = new ArrayList<>();
+        for (int i = 0; i <= N; i++) {
             graph.add(new ArrayList<>());
+            reverseGraph.add(new ArrayList<>());
         }
-        distance = new int[N + 1];
-        time = new int[N + 1];
 
+        // 그래프 입력 (단방향)
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            graph.get(a).add(new Edge(b, c));
+            int u = Integer.parseInt(st.nextToken());
+            int v = Integer.parseInt(st.nextToken());
+            int t = Integer.parseInt(st.nextToken());
+            graph.get(u).add(new Node(v, t));
+            reverseGraph.get(v).add(new Node(u, t)); // 역방향 그래프 생성
         }
 
+        // X로 가는 거리
+        int[] toX = dijkstra(graph, X);
+        // X에서 돌아오는 거리
+        int[] fromX = dijkstra(reverseGraph, X);
 
-        // i번 마을에서 X번 마을로 가는 최소 거리 구하기
+        int maxTime = 0;
         for (int i = 1; i <= N; i++) {
-            if (i == X) time[X] = 0;
-            else time[i] = calc(i, X);
+            maxTime = Math.max(maxTime, toX[i] + fromX[i]);
         }
 
-        // X번 마을에서 i번 마을로 가는 최소 거리 더하기
-        for (int i = 1; i <= N; i++) {
-            if (i != X) time[i] += calc(X, i);
-        }
-
-        for (int t : time) {
-            max = Math.max(max, t);
-        }
-
-        System.out.println(max);
-    }
-
-    // from 마을에서 to 마을로 가는 최소 거리 구하기
-    static int calc(int from, int to) {
-        Arrays.fill(distance, Integer.MAX_VALUE);
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.add(new Edge(from, 0));
-        distance[from] = 0;
-
-        while (!pq.isEmpty()) {
-            Edge edge = pq.poll();
-            int cn = edge.node;
-            int cw = edge.weight;
-
-            if (cw > distance[cn]) continue;
-
-            for (Edge e : graph.get(cn)) {
-                int nn = e.node;
-                int nw = cw + e.weight;
-                if (distance[nn] > nw) {
-                    distance[nn] = nw;
-                    pq.add(new Edge(nn, nw));
-                }
-            }
-        }
-
-        return distance[to];
+        System.out.println(maxTime);
     }
 }
