@@ -9,7 +9,7 @@ public class Main {
             this.cost = cost;
         }
         public int compareTo(Node o) {
-            return this.cost - o.cost;
+            return Integer.compare(this.cost, o.cost);
         }
     }
 
@@ -17,7 +17,7 @@ public class Main {
     static List<List<Node>> graph;
     static List<List<Node>> reverseGraph;
 
-    static final int INF = Integer.MAX_VALUE;
+    static final int INF = 1000000000; // 충분히 큰 값
 
     public static int[] dijkstra(List<List<Node>> g, int start) {
         PriorityQueue<Node> pq = new PriorityQueue<>();
@@ -29,7 +29,7 @@ public class Main {
         while (!pq.isEmpty()) {
             Node cur = pq.poll();
             int u = cur.v, cost = cur.cost;
-            if (cost > dist[u]) continue;
+            if (cost > dist[u]) continue; // 이미 최적화된 경우 스킵
 
             for (Node next : g.get(u)) {
                 int v = next.v, newCost = cost + next.cost;
@@ -57,19 +57,18 @@ public class Main {
             reverseGraph.add(new ArrayList<>());
         }
 
-        // 그래프 입력 (단방향)
+        // 그래프 입력
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int u = Integer.parseInt(st.nextToken());
             int v = Integer.parseInt(st.nextToken());
             int t = Integer.parseInt(st.nextToken());
             graph.get(u).add(new Node(v, t));
-            reverseGraph.get(v).add(new Node(u, t)); // 역방향 그래프 생성
+            reverseGraph.get(v).add(new Node(u, t)); // 역방향 그래프
         }
 
-        // X로 가는 거리
+        // 다익스트라 2번 실행
         int[] toX = dijkstra(graph, X);
-        // X에서 돌아오는 거리
         int[] fromX = dijkstra(reverseGraph, X);
 
         int maxTime = 0;
