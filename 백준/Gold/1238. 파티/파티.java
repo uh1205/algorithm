@@ -1,51 +1,29 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
-    static class Node implements Comparable<Node> {
-        int v, cost;
-        Node(int v, int cost) {
-            this.v = v;
-            this.cost = cost;
-        }
-        public int compareTo(Node o) {
-            return Integer.compare(this.cost, o.cost);
-        }
+class Edge implements Comparable<Edge> {
+    int node, weight;
+    
+    Edge(int node, int weight) {
+        this.node = node;
+        this.weight = weight;
     }
 
+    @Override
+    public int compareTo(Edge o) {
+        return this.weight - o.weight;
+    }
+}
+
+class Main {
+    
     static int N, M, X;
-    static List<List<Node>> graph;
-    static List<List<Node>> reverseGraph;
-
-    static final int INF = 1000000000; // 충분히 큰 값
-
-    public static int[] dijkstra(List<List<Node>> g, int start) {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        int[] dist = new int[N + 1];
-        Arrays.fill(dist, INF);
-        dist[start] = 0;
-        pq.offer(new Node(start, 0));
-
-        while (!pq.isEmpty()) {
-            Node cur = pq.poll();
-            int u = cur.v, cost = cur.cost;
-            if (cost > dist[u]) continue; // 이미 최적화된 경우 스킵
-
-            for (Node next : g.get(u)) {
-                int v = next.v, newCost = cost + next.cost;
-                if (newCost < dist[v]) {
-                    dist[v] = newCost;
-                    pq.offer(new Node(v, newCost));
-                }
-            }
-        }
-        return dist;
-    }
+    static List<List<Edge>> graph;
+    static List<List<Edge>> reverseGraph;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         X = Integer.parseInt(st.nextToken());
@@ -57,25 +35,51 @@ public class Main {
             reverseGraph.add(new ArrayList<>());
         }
 
-        // 그래프 입력
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int u = Integer.parseInt(st.nextToken());
             int v = Integer.parseInt(st.nextToken());
             int t = Integer.parseInt(st.nextToken());
-            graph.get(u).add(new Node(v, t));
-            reverseGraph.get(v).add(new Node(u, t)); // 역방향 그래프
+            graph.get(u).add(new Edge(v, t));
+            reverseGraph.get(v).add(new Edge(u, t)); // 역방향 그래프 생성
         }
 
-        // 다익스트라 2번 실행
         int[] toX = dijkstra(graph, X);
         int[] fromX = dijkstra(reverseGraph, X);
 
-        int maxTime = 0;
+        int max = 0;
         for (int i = 1; i <= N; i++) {
-            maxTime = Math.max(maxTime, toX[i] + fromX[i]);
+            max = Math.max(max, toX[i] + fromX[i]);
         }
 
-        System.out.println(maxTime);
+        System.out.println(max);
+    }
+
+    static int[] dijkstra(List<List<Edge>> g, int start) {
+        int[] dist = new int[N + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        pq.add(new Edge(start, 0));
+        dist[start] = 0;
+
+        while (!pq.isEmpty()) {
+            Edge cur = pq.poll();
+            int cn = cur.node;
+            int cw = cur.weight;
+            
+            if (cw > dist[cn]) continue;
+
+            for (Edge e : g.get(cn)) {
+                int nn = e.node;
+                int nw = cw + e.weight;
+                if (dist[nn] > nw) {
+                    dist[nn] = nw;
+                    pq.add(new Edge(nn, nw));
+                }
+            }
+        }
+        
+        return dist;
     }
 }
