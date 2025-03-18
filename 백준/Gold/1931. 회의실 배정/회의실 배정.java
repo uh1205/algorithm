@@ -10,10 +10,10 @@ class Meet implements Comparable<Meet> {
     }
 
     public int compareTo(Meet o) {
-        if (this.e != o.e) {
-            return this.e - o.e;
+        if (this.e == o.e) {
+            return this.s - o.s;
         }
-        return this.s - o.s;
+        return this.e - o.e;
     }
 }
 
@@ -31,8 +31,8 @@ class Main {
             pq.add(new Meet(s, e));
         }
 
-        int last = pq.poll().e;
-        int cnt = 1;
+        int cnt = 0;
+        int last = 0;
 
         while (!pq.isEmpty()) {
             Meet m = pq.poll();
