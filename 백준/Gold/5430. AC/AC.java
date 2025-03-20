@@ -10,15 +10,12 @@ public class Main {
         while (T-- > 0) {
             String p = br.readLine(); // 수행할 함수
             int n = Integer.parseInt(br.readLine()); // 배열 크기
-            String input = br.readLine(); // 배열 입력
 
             // 배열 파싱 ([], [1,2,3] 같은 형태에서 숫자만 추출)
             Deque<Integer> deque = new ArrayDeque<>();
-            if (n > 0) {
-                String[] numbers = input.substring(1, input.length() - 1).split(",");
-                for (String num : numbers) {
-                    deque.add(Integer.parseInt(num));
-                }
+            StringTokenizer st = new StringTokenizer(br.readLine(), "[],");
+            while (n-- > 0) {
+                deque.add(Integer.parseInt(st.nextToken()));
             }
 
             boolean reverse = false; // 뒤집힘 여부 플래그
