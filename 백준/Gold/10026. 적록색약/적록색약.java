@@ -1,91 +1,71 @@
 import java.io.*;
-import java.util.*;
 
-class Main {
-
-    static int N, cnt1, cnt2;
-    static char[][] map;
-    static boolean[][] visited1, visited2;
-    static int[] dr = {0, 1, 0, -1};
-    static int[] dc = {1, 0, -1, 0};
+public class Main {
+    static int N;
+    static char[][] grid, colorBlindGrid;
+    static boolean[][] visited;
+    static int[] dx = {-1, 1, 0, 0}; // 상, 하, 좌, 우
+    static int[] dy = {0, 0, -1, 1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
+        
+        grid = new char[N][N];
+        colorBlindGrid = new char[N][N];
 
-        map = new char[N][N];
-        visited1 = new boolean[N][N];
-        visited2 = new boolean[N][N];
-
+        // 입력 받으면서 일반 그리드 & 적록색약 그리드 생성
         for (int i = 0; i < N; i++) {
-            map[i] = br.readLine().toCharArray();
+            String line = br.readLine();
+            for (int j = 0; j < N; j++) {
+                grid[i][j] = line.charAt(j);
+                // 적록색약 처리 (R과 G를 동일하게 취급)
+                colorBlindGrid[i][j] = (line.charAt(j) == 'G') ? 'R' : line.charAt(j);
+            }
         }
 
+        // 일반인의 구역 개수 구하기
+        visited = new boolean[N][N];
+        int normalCount = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (!visited1[i][j]) {
-                    bfs1(i, j);
-                    cnt1++;
-                }
-                if (!visited2[i][j]) {
-                    bfs2(i, j);
-                    cnt2++;
+                if (!visited[i][j]) {
+                    dfs(i, j, grid[i][j], grid);
+                    normalCount++;
                 }
             }
         }
 
-        System.out.println(cnt1 + " " + cnt2);
+        // 적록색약의 구역 개수 구하기
+        visited = new boolean[N][N];
+        int colorBlindCount = 0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (!visited[i][j]) {
+                    dfs(i, j, colorBlindGrid[i][j], colorBlindGrid);
+                    colorBlindCount++;
+                }
+            }
+        }
+
+        // 결과 출력
+        System.out.println(normalCount + " " + colorBlindCount);
     }
 
-    static void bfs1(int r, int c) {
-        Queue<int[]> q = new LinkedList<>();
-        q.add(new int[]{r, c});
-        visited1[r][c] = true;
+    // DFS 탐색 함수
+    static void dfs(int x, int y, char color, char[][] map) {
+        visited[x][y] = true;
 
-        while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            int cr = cur[0];
-            int cc = cur[1];
-            char cch = map[cr][cc]; // 현재 문자
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
 
-            for (int d = 0; d < 4; d++) {
-                int nr = cr + dr[d];
-                int nc = cc + dc[d];
-                if (nr < 0 || nc < 0 || nr >= N || nc >= N) continue;
-
-                char nch = map[nr][nc]; // 다음 문자
-                if (!visited1[nr][nc] && nch == cch) {
-                    q.add(new int[]{nr, nc});
-                    visited1[nr][nc] = true;
+            // 범위 체크 및 방문 여부 확인
+            if (nx >= 0 && ny >= 0 && nx < N && ny < N) {
+                if (!visited[nx][ny] && map[nx][ny] == color) {
+                    dfs(nx, ny, color, map);
                 }
             }
         }
     }
-
-    static void bfs2(int r, int c) {
-        Queue<int[]> q = new LinkedList<>();
-        q.add(new int[]{r, c});
-        visited2[r][c] = true;
-
-        while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            int cr = cur[0];
-            int cc = cur[1];
-            char cch = map[cr][cc]; // 현재 문자
-
-            for (int d = 0; d < 4; d++) {
-                int nr = cr + dr[d];
-                int nc = cc + dc[d];
-                if (nr < 0 || nc < 0 || nr >= N || nc >= N) continue;
-                
-                char nch = map[nr][nc]; // 다음 문자
-                if (visited2[nr][nc]) continue;
-                if (nch == cch || (cch != 'B' && nch != 'B')) {
-                    q.add(new int[]{nr, nc});
-                    visited2[nr][nc] = true;
-                }
-            }
-        }
-    }
-
 }
