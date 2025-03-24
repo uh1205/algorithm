@@ -1,53 +1,55 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
+class Main {
+    static StringBuilder result = new StringBuilder();
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-        int T = Integer.parseInt(br.readLine()); // 테스트 케이스 개수
+        int T = Integer.parseInt(br.readLine());
 
         while (T-- > 0) {
-            String p = br.readLine(); // 수행할 함수
-            int n = Integer.parseInt(br.readLine()); // 배열 크기
+            String cmds = br.readLine();
+            int n = Integer.parseInt(br.readLine());
 
-            // 배열 파싱 ([], [1,2,3] 같은 형태에서 숫자만 추출)
-            Deque<Integer> deque = new ArrayDeque<>();
+            Deque<Integer> dq = new ArrayDeque<>();
             StringTokenizer st = new StringTokenizer(br.readLine(), "[],");
             while (n-- > 0) {
-                deque.add(Integer.parseInt(st.nextToken()));
+                dq.add(Integer.parseInt(st.nextToken()));
             }
 
-            boolean reverse = false; // 뒤집힘 여부 플래그
-            boolean error = false;   // 에러 발생 여부
+            AC(cmds, dq);
+        }
 
-            for (char command : p.toCharArray()) {
-                if (command == 'R') {
-                    reverse = !reverse; // 뒤집기 플래그 토글
-                } else { // 'D' 연산
-                    if (deque.isEmpty()) {
-                        error = true;
-                        break;
-                    }
-                    if (reverse) {
-                        deque.pollLast(); // 뒤에서 제거
-                    } else {
-                        deque.pollFirst(); // 앞에서 제거
-                    }
-                }
-            }
+        System.out.println(result);
+    }
 
-            if (error) {
-                sb.append("error\n");
+    static void AC(String cmds, Deque<Integer> dq) {
+        boolean reverse = false;
+        boolean error = false;
+
+        for (char cmd : cmds.toCharArray()) {
+            if (cmd == 'R') {
+                reverse = !reverse;
             } else {
-                sb.append("[");
-                while (!deque.isEmpty()) {
-                    sb.append(reverse ? deque.pollLast() : deque.pollFirst());
-                    if (!deque.isEmpty()) sb.append(",");
+                if (dq.isEmpty()) {
+                    error = true;
+                    break;
                 }
-                sb.append("]\n");
+                if (reverse) dq.pollLast();
+                else dq.pollFirst();
             }
         }
-        System.out.print(sb);
+
+        if (error) {
+            result.append("error\n");
+        } else {
+            result.append("[");
+            while (!dq.isEmpty()) {
+                result.append(reverse ? dq.pollLast() : dq.pollFirst());
+                if (!dq.isEmpty()) result.append(',');
+            }
+            result.append("]\n");
+        }
     }
 }
