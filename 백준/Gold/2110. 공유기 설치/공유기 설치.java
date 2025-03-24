@@ -2,47 +2,51 @@ import java.io.*;
 import java.util.*;
 
 class Main {
+    static int N, C;
+    static int[] houses;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken()); // 집 개수
-        int C = Integer.parseInt(st.nextToken()); // 공유기 개수
-        int[] houses = new int[N];
+        N = Integer.parseInt(st.nextToken()); // 집 개수
+        C = Integer.parseInt(st.nextToken()); // 공유기 개수
+        houses = new int[N];
 
-        // 집 좌표 입력
         for (int i = 0; i < N; i++) {
             houses[i] = Integer.parseInt(br.readLine());
         }
 
-        // 집 좌표 정렬
         Arrays.sort(houses);
 
-        // 이진 탐색 범위 설정
-        int left = 1; // 최소 거리
-        int right = houses[N - 1] - houses[0]; // 최대 거리
+        // 이진 탐색 (최소 거리: 1, 최대 거리: 가장 멀리 떨어진 두 집의 거리)
+        int left = 1;
+        int right = houses[N - 1] - houses[0];
         int result = 0;
 
         while (left <= right) {
-            int mid = (left + right) / 2; // 현재 거리 후보
-            int count = 1; // 첫 번째 집에 공유기 설치
-            int lastPosition = houses[0]; // 마지막으로 공유기를 설치한 위치
-
-            // 현재 mid 거리로 공유기 설치 가능 여부 확인
-            for (int i = 1; i < N; i++) {
-                if (houses[i] - lastPosition >= mid) { // 현재 거리보다 크거나 같으면 설치 가능
-                    count++;
-                    lastPosition = houses[i];
-                }
-            }
-
-            if (count >= C) { // 공유기 개수를 충족하면 거리를 늘려본다.
-                result = mid;
-                left = mid + 1;
-            } else { // 공유기 개수가 부족하면 거리를 줄여야 한다.
-                right = mid - 1;
+            int mid = left + (right - left) / 2; // (left + right) / 2 보다 안전한 방식
+            if (canInstallRouters(mid)) { // 공유기 설치 가능 여부 체크
+                result = mid; // 가능한 거리 저장
+                left = mid + 1; // 거리 늘려보기
+            } else {
+                right = mid - 1; // 거리 줄이기
             }
         }
 
         System.out.println(result);
+    }
+
+    // 공유기 설치 가능 여부 확인 (true: 설치 가능, false: 설치 불가능)
+    public static boolean canInstallRouters(int distance) {
+        int count = 1; // 첫 번째 집에 공유기 설치
+        int lastPosition = houses[0]; // 마지막 공유기 설치 위치
+
+        for (int i = 1; i < N; i++) {
+            if (houses[i] - lastPosition >= distance) { // 공유기 설치 가능하면
+                count++;
+                lastPosition = houses[i];
+            }
+        }
+        return count >= C;
     }
 }
