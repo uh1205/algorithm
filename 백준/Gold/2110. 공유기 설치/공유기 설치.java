@@ -6,21 +6,20 @@ class Main {
     static int[] houses;
 
     public static void main(String[] args) throws IOException {
+        // 빠른 입력
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken()); // 집 개수
-        C = Integer.parseInt(st.nextToken()); // 공유기 개수
+        N = readInt();
+        C = readInt();
         houses = new int[N];
 
+        // 집 좌표 입력 & 정렬
         for (int i = 0; i < N; i++) {
-            houses[i] = Integer.parseInt(br.readLine());
+            houses[i] = readInt();
         }
-
         Arrays.sort(houses);
 
         // 이진 탐색 (최소 거리: 1, 최대 거리: 가장 멀리 떨어진 두 집의 거리)
-        int left = 1;
-        int right = houses[N - 1] - houses[0];
+        int left = 1, right = houses[N - 1] - houses[0];
         int result = 0;
 
         while (left <= right) {
@@ -48,5 +47,19 @@ class Main {
             }
         }
         return count >= C;
+    }
+
+    // 빠른 정수 입력 (System.in.read() 활용)
+    public static int readInt() throws IOException {
+        int value = 0, sign = 1;
+        int c = System.in.read();
+        while (c <= ' ') c = System.in.read(); // 공백 문자 건너뛰기
+        if (c == '-') { sign = -1; c = System.in.read(); } // 음수 처리
+
+        while (c >= '0' && c <= '9') { // 숫자 변환
+            value = value * 10 + (c - '0');
+            c = System.in.read();
+        }
+        return value * sign;
     }
 }
