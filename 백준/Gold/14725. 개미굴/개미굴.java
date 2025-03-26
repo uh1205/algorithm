@@ -2,9 +2,7 @@ import java.io.*;
 import java.util.*;
 
 class Node implements Comparable<Node> {
-
-    String root;
-    String name;
+    String root, name;
     int depth;
     PriorityQueue<Node> nodes;
 
