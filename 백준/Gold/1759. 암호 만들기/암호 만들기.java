@@ -4,55 +4,51 @@ import java.util.*;
 public class Main {
     static int L, C;
     static char[] letters;
-    static List<String> result = new ArrayList<>();
+    static char[] password;
+    static StringBuilder result = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
-        // 1. 입력 받기
         StringTokenizer st = new StringTokenizer(br.readLine());
         L = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
-        
+        password = new char[L];
         letters = new char[C];
+
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < C; i++) {
             letters[i] = st.nextToken().charAt(0);
         }
 
-        // 2. 문자 정렬 (사전순)
         Arrays.sort(letters);
-
-        // 3. 백트래킹 실행
-        backtrack(0, 0, "", 0, 0);
-
-        // 4. 결과 출력
-        for (String password : result) {
-            System.out.println(password);
-        }
+        combination(0, 0);
+        System.out.println(result);
     }
 
-    static void backtrack(int index, int count, String current, int vowels, int consonants) {
-        // 1) 종료 조건: L개 선택한 경우
-        if (count == L) {
-            if (vowels >= 1 && consonants >= 2) {  // 유효한 암호인지 확인
-                result.add(current);
-            }
+    static void combination(int depth, int start) {
+        if (depth == L) {
+            addPassword();
             return;
         }
-
-        // 2) 백트래킹 탐색
-        for (int i = index; i < C; i++) {
-            char ch = letters[i];
-            if (isVowel(ch)) {
-                backtrack(i + 1, count + 1, current + ch, vowels + 1, consonants);
-            } else {
-                backtrack(i + 1, count + 1, current + ch, vowels, consonants + 1);
-            }
+        for (int i = start; i < C; i++) {
+            password[depth] = letters[i];
+            combination(depth + 1, i + 1); // start가 아니라 i
         }
     }
 
-    static boolean isVowel(char ch) {
-        return "aeiou".indexOf(ch) != -1;
+    static void addPassword() {
+        int vowel = 0;
+        int consonant = 0;
+        for (char p : password) {
+            if (p == 'a' || p == 'e' || p == 'i' || p == 'o' || p == 'u') {
+                vowel++;
+            } else {
+                consonant++;
+            }
+        }
+        if (vowel >= 1 && consonant >= 2) {
+            result.append(password).append('\n');
+        }
     }
+
 }
