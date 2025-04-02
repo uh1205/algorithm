@@ -1,45 +1,45 @@
 import java.io.*;
-import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
-
-        Map<Character, Integer> weightMap = new HashMap<>();
         String[] words = new String[N];
 
-        // 입력 및 가중치 계산
+        int[] weight = new int[26]; // A ~ Z까지의 가중치
+
         for (int i = 0; i < N; i++) {
             words[i] = br.readLine();
             int len = words[i].length();
+
             for (int j = 0; j < len; j++) {
                 char c = words[i].charAt(j);
-                weightMap.put(c, weightMap.getOrDefault(c, 0) + (int) Math.pow(10, len - j - 1));
+                int idx = c - 'A';
+                weight[idx] += (int) Math.pow(10, len - j - 1);
             }
         }
 
-        // 가중치 높은 순으로 정렬
-        List<Map.Entry<Character, Integer>> weightList = new ArrayList<>(weightMap.entrySet());
-        weightList.sort((a, b) -> b.getValue() - a.getValue());
+        int num = 9, max = -1, idx = -1, sum = 0;
 
-        // 숫자 할당 (9부터 차례대로)
-        Map<Character, Integer> numMap = new HashMap<>();
-        int num = 9;
-        for (Map.Entry<Character, Integer> entry : weightList) {
-            numMap.put(entry.getKey(), num--);
-        }
+        while (num > 0 && max != 0) {
+            max = 0;
 
-        // 총합 계산
-        int total = 0;
-        for (String word : words) {
-            int value = 0;
-            for (char c : word.toCharArray()) {
-                value = value * 10 + numMap.get(c);
+            // 가중치가 가장 큰 글자 찾기
+            for (int i = 0; i < 26; i++) {
+                if (max < weight[i]) {
+                    max = weight[i];
+                    idx = i;
+                }
             }
-            total += value;
+
+            // 가중치가 0이 아니라면
+            if (max != 0) {
+                sum += weight[idx] * num--;
+            }
+            
+            weight[idx] = 0;
         }
 
-        System.out.println(total);
+        System.out.println(sum);
     }
 }
