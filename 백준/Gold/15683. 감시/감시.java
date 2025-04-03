@@ -3,46 +3,45 @@ import java.util.*;
 
 public class Main {
     static int N, M;
-    static int[][] office;
+    static int[][] map;
     static List<CCTV> cctvs = new ArrayList<>();
     static int minBlindSpots = Integer.MAX_VALUE;
 
     // CCTV 방향 설정 (우, 좌, 하, 상)
     static int[][] directions = {
-        {0, 1}, {0, -1}, {1, 0}, {-1, 0}
+            {0, 1}, {1, 0}, {0, -1}, {-1, 0}
     };
 
     // CCTV 별 감시 가능한 방향 (회전 포함)
     static int[][][] cctvDirections = {
-        {}, // 0번 (사용 X)
-        {{0}, {1}, {2}, {3}}, // 1번
-        {{0, 1}, {2, 3}}, // 2번
-        {{0, 2}, {2, 1}, {1, 3}, {3, 0}}, // 3번
-        {{0, 2, 3}, {0, 1, 2}, {1, 2, 3}, {0, 1, 3}}, // 4번
-        {{0, 1, 2, 3}} // 5번
+            {}, // 0번 (사용 X)
+            {{0}, {1}, {2}, {3}}, // 1번
+            {{0, 2}, {1, 3}}, // 2번
+            {{0, 1}, {1, 2}, {2, 3}, {3, 0}}, // 3번
+            {{0, 1, 2}, {1, 2, 3}, {2, 3, 0}, {3, 0, 1}}, // 4번
+            {{0, 1, 2, 3}} // 5번
     };
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        office = new int[N][M];
+        map = new int[N][M];
 
         // 입력 받기 & CCTV 정보 저장
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < M; j++) {
-                office[i][j] = Integer.parseInt(st.nextToken());
-                if (office[i][j] >= 1 && office[i][j] <= 5) {
-                    cctvs.add(new CCTV(i, j, office[i][j]));
+                map[i][j] = Integer.parseInt(st.nextToken());
+                if (map[i][j] >= 1 && map[i][j] <= 5) {
+                    cctvs.add(new CCTV(i, j, map[i][j]));
                 }
             }
         }
 
         // 백트래킹을 사용하여 CCTV 방향 설정 및 탐색
-        dfs(0, office);
+        dfs(0, map);
         System.out.println(minBlindSpots);
     }
 
@@ -57,10 +56,10 @@ public class Main {
         int type = cctv.type;
 
         // CCTV 종류에 따른 모든 방향 탐색
-        for (int[] directions : cctvDirections[type]) {
+        for (int[] directions : cctvDirections[type]) { // 2번일 경우: {0, 2}, {1, 3}
             int[][] copiedMap = copyMap(map);
             for (int dir : directions) {
-                markSurveillance(copiedMap, cctv.x, cctv.y, dir);
+                markSurveillanceArea(copiedMap, cctv.x, cctv.y, dir);
             }
             dfs(depth + 1, copiedMap);
         }
@@ -78,7 +77,7 @@ public class Main {
     }
 
     // 감시 영역 표시
-    static void markSurveillance(int[][] map, int x, int y, int dir) {
+    static void markSurveillanceArea(int[][] map, int x, int y, int dir) {
         int nx = x;
         int ny = y;
 
@@ -108,6 +107,7 @@ public class Main {
     // CCTV 위치 정보를 저장하는 클래스
     static class CCTV {
         int x, y, type;
+
         CCTV(int x, int y, int type) {
             this.x = x;
             this.y = y;
