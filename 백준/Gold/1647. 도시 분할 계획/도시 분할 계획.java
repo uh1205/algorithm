@@ -1,66 +1,66 @@
 import java.io.*;
 import java.util.*;
 
-class Main {
-    static int N, M;
-    static List<List<Edge>> graph;
-    static boolean[] visited;
+public class Main {
+    static int[] parent;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
 
-        graph = new ArrayList<>();
-        for (int i = 0; i < N + 1; i++) {
-            graph.add(new ArrayList<>());
-        }
+        int N = Integer.parseInt(st.nextToken()); // 집 개수
+        int M = Integer.parseInt(st.nextToken()); // 길 개수
 
-        visited = new boolean[N + 1];
+        PriorityQueue<Edge> edges = new PriorityQueue<>();
+        parent = new int[N + 1];
+
+        for (int i = 1; i <= N; i++) parent[i] = i;
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
-            int A = Integer.parseInt(st.nextToken());
-            int B = Integer.parseInt(st.nextToken());
-            int C = Integer.parseInt(st.nextToken());
-
-            graph.get(A).add(new Edge(B, C));
-            graph.get(B).add(new Edge(A, C));
+            int from = Integer.parseInt(st.nextToken());
+            int to = Integer.parseInt(st.nextToken());
+            int cost = Integer.parseInt(st.nextToken());
+            edges.add(new Edge(from, to, cost));
         }
 
-        int sum = 0, max = 0;
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.add(new Edge(1, 0));
+//        Collections.sort(edges); // 비용 기준 오름차순 정렬
 
-        while (!pq.isEmpty()) {
-            Edge cur = pq.poll();
-            int node = cur.node;
+        int total = 0;
+        int maxEdge = 0;
 
-            if (visited[node]) continue;
-
-            visited[node] = true;
-            sum += cur.cost;
-            max = Math.max(max, cur.cost);
-
-            for (Edge e : graph.get(node)) {
-                if (!visited[e.node]) {
-                    pq.add(e);
-                }
+        while (!edges.isEmpty()) {
+            Edge cur = edges.poll();
+            int a = find(cur.from);
+            int b = find(cur.to);
+            if (a != b) {
+                if (a < b) parent[a] = b;
+                else parent[b] = a;
+                total += cur.cost;
+                maxEdge = Math.max(maxEdge, cur.cost); // MST에서 가장 큰 간선 저장
             }
         }
 
-        System.out.println(sum - max);
+        System.out.println(total - maxEdge); // 가장 비싼 간선 제거
+    }
+
+    static int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]); // 경로 압축
+        }
+        return parent[x];
     }
 
     static class Edge implements Comparable<Edge> {
-        int node, cost;
+        int from, to, cost;
 
-        Edge(int node, int cost) {
-            this.node = node;
+        Edge(int from, int to, int cost) {
+            this.from = from;
+            this.to = to;
             this.cost = cost;
         }
 
+        @Override
         public int compareTo(Edge o) {
             return this.cost - o.cost;
         }
