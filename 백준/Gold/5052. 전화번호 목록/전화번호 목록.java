@@ -25,7 +25,7 @@ public class Main {
 
             while (!pq.isEmpty()) {
                 Phone second = pq.poll();
-                if (isPrefixOf(first.phone, second.phone)) {
+                if (second.phone.startsWith(first.phone)) {
                     isConsistent = false;
                     break;
                 }
@@ -36,19 +36,6 @@ public class Main {
         }
 
         System.out.println(sb);
-    }
-
-    static boolean isPrefixOf(String prefix, String s) {
-        int prefixLen = prefix.length();
-        int sLen = s.length();
-
-        if (prefixLen > sLen) return false;
-        if (prefixLen == sLen) {
-            return prefix.equals(s);
-        }
-
-        if (prefix.equals(s.substring(0, prefixLen))) return true;
-        return false;
     }
 
     static class Phone implements Comparable<Phone> {
