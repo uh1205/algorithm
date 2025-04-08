@@ -32,6 +32,28 @@ class Main {
         int start = Integer.parseInt(st.nextToken());
         int end = Integer.parseInt(st.nextToken());
 
+        dijkstra(start);
+
+        StringBuilder result = new StringBuilder();
+        result.append(dist[end]).append('\n');
+
+        // 경로 역추적
+        Stack<Integer> path = new Stack<>();
+        int cur = end;
+        while (cur != 0) {
+            path.push(cur);
+            cur = prev[cur];
+        }
+        result.append(path.size()).append('\n'); // 경로에 포함된 도시 수
+
+        while (!path.isEmpty()) {
+            result.append(path.pop()).append(' ');
+        }
+
+        System.out.println(result);
+    }
+
+    static void dijkstra(int start) {
         PriorityQueue<Edge> pq = new PriorityQueue<>();
         pq.add(new Edge(start, 0));
         dist[start] = 0;
@@ -52,21 +74,6 @@ class Main {
                     pq.add(new Edge(nn, nc));
                 }
             }
-        }
-
-        System.out.println(dist[end]);
-
-        // 경로 역추적
-        Stack<Integer> path = new Stack<>();
-        int cur = end;
-        while (cur != 0) {
-            path.push(cur);
-            cur = prev[cur];
-        }
-
-        System.out.println(path.size()); // 경로에 포함된 도시 수
-        while (!path.isEmpty()) {
-            System.out.print(path.pop() + " ");
         }
     }
 
