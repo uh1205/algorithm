@@ -2,6 +2,8 @@ import java.util.*;
 
 class Solution {
     public boolean solution(int n, int[][] path, int[][] order) {
+        boolean[] visited = new boolean[n]; // 방문 여부
+        
         List<List<Integer>> graph = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             graph.add(new ArrayList<>());
@@ -12,22 +14,18 @@ class Solution {
             graph.get(p[1]).add(p[0]);
         }
 
-        // order 조건
         int[] before = new int[n]; // 특정 방을 방문하려면 먼저 방문해야 하는 방
         Arrays.fill(before, -1);
         for (int[] o : order) {
             before[o[1]] = o[0];
         }
 
-        // 방문 여부
-        boolean[] visited = new boolean[n];
-        // 대기중인 방들
-        Map<Integer, Integer> waiting = new HashMap<>();
+        Map<Integer, Integer> waiting = new HashMap<>(); // 대기중인 방들
 
         Queue<Integer> q = new ArrayDeque<>();
         if (before[0] != -1) return false; // 시작 방이 누군가의 후순위라면 불가능
 
-        q.offer(0);
+        q.add(0);
         visited[0] = true;
 
         while (!q.isEmpty()) {
@@ -36,27 +34,27 @@ class Solution {
             for (int next : graph.get(now)) {
                 if (visited[next]) continue;
 
-                if (before[next] != -1 && !visited[before[next]]) {
-                    // 아직 선행 방 안 갔으면 대기시킴
-                    waiting.put(before[next], next);
+                int bn = before[next]; // next 방을 방문하기 위해 먼저 방문해야 할 방
+                if (bn != -1 && !visited[bn]) { // 선행할 방이 있으면서, 아직 선행 방을 안 갔으면
+                    waiting.put(bn, next); // 대기시킴
                     continue;
                 }
 
                 visited[next] = true;
-                q.offer(next);
+                q.add(next);
             }
 
-            // 내가 누군가의 선행 방이라면, 그 방이 대기 중인지 확인
+            // 내가 누군가의 선행 방이라면 (누가 날 방문하기를 기다리고 있다면)
             if (waiting.containsKey(now)) {
-                int target = waiting.get(now);
-                q.offer(target);
+                int target = waiting.get(now); // 기다리고 있는 방
+                q.add(target);
                 visited[target] = true;
-                waiting.remove(now);
+                waiting.remove(now); // 웨이팅 목록에서 제거
             }
         }
 
         for (boolean v : visited) {
-            if (!v) return false;
+            if (!v) return false; // 방문하지 않은 방이 있다면 실패
         }
 
         return true;
