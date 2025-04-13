@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, farthestNode, farthestDist = 0;
+    static int n, farthestNode, maxDist = 0;
     static List<List<Edge>> tree = new ArrayList<>();
     static boolean[] visited;
 
@@ -27,32 +27,28 @@ public class Main {
         }
 
         // 1번 노드에서 가장 먼 노드 찾기
-        visited[1] = true;
         dfs(1, 0);
 
+        // 해당 노드에서 다시 가장 먼 거리 구하기
         visited = new boolean[n + 1];
-        farthestDist = 0;
-
-        // 해당 노드에서 가장 먼 노드 찾기
-        visited[farthestNode] = true;
+        maxDist = 0;
         dfs(farthestNode, 0);
 
-        System.out.println(farthestDist);
+        System.out.println(maxDist);
     }
 
     static void dfs(int node, int dist) {
+        visited[node] = true;
+
+        if (dist > maxDist) {
+            maxDist = dist;
+            farthestNode = node;
+        }
+
         for (Edge next : tree.get(node)) {
-            int nn = next.node;
-
-            if (visited[nn]) continue;
-            visited[nn] = true;
-
-            int nw = dist + next.weight;
-            if (nw > farthestDist) {
-                farthestNode = nn;
-                farthestDist = nw;
+            if (!visited[next.node]) {
+                dfs(next.node, dist + next.weight);
             }
-            dfs(nn, nw);
         }
     }
 
