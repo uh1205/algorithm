@@ -7,9 +7,10 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+        
         int K = Integer.parseInt(br.readLine());
 
-        StringBuilder sb = new StringBuilder();
         while (K-- > 0) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             int V = Integer.parseInt(st.nextToken());
@@ -33,9 +34,7 @@ public class Main {
 
             for (int i = 1; i <= V && isBipartite; i++) {
                 if (color[i] == 0) {
-                    if (!bfs(i)) {
-                        isBipartite = false;
-                    }
+                    if (!bfs(i)) isBipartite = false; // bfs 결과가 false인 경우
                 }
             }
 
