@@ -2,64 +2,61 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static List<Integer>[] graph;
-    static int[] colors;
+    static List<List<Integer>> graph;
+    static int[] color;
     static boolean isBipartite;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int k = Integer.parseInt(br.readLine());  // 테스트케이스 개수
+        int K = Integer.parseInt(br.readLine());
+
         StringBuilder sb = new StringBuilder();
-
-        for (int t = 0; t < k; t++) {
+        while (K-- > 0) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            int v = Integer.parseInt(st.nextToken()); // 정점 개수
-            int e = Integer.parseInt(st.nextToken()); // 간선 개수
+            int V = Integer.parseInt(st.nextToken());
+            int E = Integer.parseInt(st.nextToken());
 
-            // 그래프 초기화
-            graph = new ArrayList[v + 1];
-            for (int i = 1; i <= v; i++) {
-                graph[i] = new ArrayList<>();
+            graph = new ArrayList<>();
+            for (int i = 0; i < V + 1; i++) {
+                graph.add(new ArrayList<>());
             }
 
-            // 간선 정보 입력
-            for (int i = 0; i < e; i++) {
+            for (int i = 0; i < E; i++) {
                 st = new StringTokenizer(br.readLine());
                 int u = Integer.parseInt(st.nextToken());
-                int w = Integer.parseInt(st.nextToken());
-                graph[u].add(w);
-                graph[w].add(u);
+                int v = Integer.parseInt(st.nextToken());
+                graph.get(u).add(v);
+                graph.get(v).add(u);
             }
 
-            // 색상 배열 (0: 미방문, 1: RED, -1: BLUE)
-            colors = new int[v + 1];
+            color = new int[V + 1]; // -1: blue, 0: unvisited, 1: red
             isBipartite = true;
 
-            for (int i = 1; i <= v; i++) {
-                if (colors[i] == 0) {
+            for (int i = 1; i <= V; i++) {
+                if (color[i] == 0) {
                     bfs(i);
                 }
             }
 
-            sb.append(isBipartite ? "YES\n" : "NO\n");
+            sb.append(isBipartite ? "YES" : "NO").append('\n');
         }
 
-        System.out.print(sb);
+        System.out.println(sb);
     }
 
-    static void bfs(int start) {
+    static void bfs(int node) {
         Queue<Integer> q = new LinkedList<>();
-        q.offer(start);
-        colors[start] = 1;
+        q.add(node);
+        color[node] = 1; // 시작은 red
 
         while (!q.isEmpty() && isBipartite) {
-            int current = q.poll();
+            int cur = q.poll();
 
-            for (int next : graph[current]) {
-                if (colors[next] == 0) {
-                    colors[next] = -colors[current];  // 서로 다른 색
-                    q.offer(next);
-                } else if (colors[next] == colors[current]) {
+            for (int next : graph.get(cur)) {
+                if (color[next] == 0) {
+                    color[next] = -color[cur]; // 반대 색깔로 칠하기
+                    q.add(next);
+                } else if (color[next] == color[cur]) {
                     isBipartite = false;
                     return;
                 }
