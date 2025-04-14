@@ -4,7 +4,6 @@ import java.util.*;
 public class Main {
     static List<List<Integer>> graph;
     static int[] color;
-    static boolean isBipartite;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -17,7 +16,7 @@ public class Main {
             int E = Integer.parseInt(st.nextToken());
 
             graph = new ArrayList<>();
-            for (int i = 0; i < V + 1; i++) {
+            for (int i = 0; i <= V; i++) {
                 graph.add(new ArrayList<>());
             }
 
@@ -29,38 +28,41 @@ public class Main {
                 graph.get(v).add(u);
             }
 
-            color = new int[V + 1]; // -1: blue, 0: unvisited, 1: red
-            isBipartite = true;
+            color = new int[V + 1]; // 0: 방문 전, 1: 빨강, -1: 파랑
+            boolean isBipartite = true;
 
-            for (int i = 1; i <= V; i++) {
+            for (int i = 1; i <= V && isBipartite; i++) {
                 if (color[i] == 0) {
-                    bfs(i);
+                    if (!bfs(i)) {
+                        isBipartite = false;
+                    }
                 }
             }
 
             sb.append(isBipartite ? "YES" : "NO").append('\n');
         }
 
-        System.out.println(sb);
+        System.out.print(sb);
     }
 
-    static void bfs(int node) {
-        Queue<Integer> q = new LinkedList<>();
-        q.add(node);
-        color[node] = 1; // 시작은 red
+    static boolean bfs(int start) {
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(start);
+        color[start] = 1;
 
-        while (!q.isEmpty() && isBipartite) {
-            int cur = q.poll();
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
 
             for (int next : graph.get(cur)) {
                 if (color[next] == 0) {
-                    color[next] = -color[cur]; // 반대 색깔로 칠하기
-                    q.add(next);
+                    color[next] = -color[cur];
+                    queue.offer(next);
                 } else if (color[next] == color[cur]) {
-                    isBipartite = false;
-                    return;
+                    return false;
                 }
             }
         }
+
+        return true;
     }
 }
