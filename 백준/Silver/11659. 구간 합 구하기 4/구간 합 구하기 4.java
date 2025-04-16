@@ -8,12 +8,13 @@ public class Main {
         int N = Integer.parseInt(st.nextToken());
         int M = Integer.parseInt(st.nextToken());
 
-        int[] arr = new int[N];
+        int[] arr = new int[N + 1];
         int[] prefixSum = new int[N + 1];
 
         st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i <= N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
+            prefixSum[i] = prefixSum[i - 1] + arr[i];
         }
 
         prefixSum[0] = arr[0];
@@ -24,12 +25,10 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         while (M-- > 0) {
             st = new StringTokenizer(br.readLine());
-            int i = Integer.parseInt(st.nextToken()) - 1;
-            int j = Integer.parseInt(st.nextToken()) - 1;
+            int i = Integer.parseInt(st.nextToken());
+            int j = Integer.parseInt(st.nextToken());
 
-            int k = i < 1 ? 0 : prefixSum[i - 1];
-            int sum = prefixSum[j] - k;
-            sb.append(sum).append('\n');
+            sb.append(prefixSum[j] - prefixSum[i - 1]).append('\n');
         }
 
         System.out.println(sb);
