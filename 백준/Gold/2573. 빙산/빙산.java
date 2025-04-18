@@ -1,10 +1,8 @@
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
-    static int N, M, year = 0;
+    static int N, M;
     static int[][] map;
     static boolean[][] visited;
     static int[] dr = {0, 1, 0, -1};
@@ -25,34 +23,26 @@ public class Main {
             }
         }
 
+        int year = 0;
         while (true) {
-            year++;
-            int[][] tempMap = copyMap(map);
+            int count = countIcebergs(); // 이어진 빙산 개수 구하기
 
-            // 빙산 녹이기
-            for (int i = 1; i < N - 1; i++) {
-                for (int j = 1; j < M - 1; j++) {
-                    if (map[i][j] > 0) {
-                        int melted = map[i][j] - countSea(map, i, j);
-                        tempMap[i][j] = Math.max(melted, 0);
-                    }
-                }
-            }
-            map = tempMap;
-
-            // 이어진 빙산 개수 구하기
-            int iceberg = countIceberg();
-            if (iceberg >= 2) { // 분리된 경우
-                System.out.println(year);
-                return;
-            } else if (iceberg == 0) { // 다 녹을 때까지 분리되지 않은 경우
+            if (count == 0) { // 다 녹을 때까지 분리되지 않은 경우
                 System.out.println(0);
-                return;
+                break;
             }
+
+            if (count >= 2) { // 분리된 경우
+                System.out.println(year);
+                break;
+            }
+
+            meltIcebergs(); // 빙산 녹이기
+            year++;
         }
     }
 
-    static int countIceberg() {
+    static int countIcebergs() {
         int count = 0;
         visited = new boolean[N][M];
 
@@ -89,22 +79,30 @@ public class Main {
         }
     }
 
-    static int[][] copyMap(int[][] map) {
-        int[][] copied = new int[N][M];
-        for (int i = 0; i < N; i++) {
-            copied[i] = map[i].clone();
-        }
-        return copied;
-    }
+    static void meltIcebergs() {
+        int[][] melt = new int[N][M];
 
-    static int countSea(int[][] map, int r, int c) {
-        int count = 0;
-        for (int d = 0; d < 4; d++) {
-            int nr = r + dr[d];
-            int nc = c + dc[d];
-            if (map[nr][nc] == 0) count++;
+        // 바닷물에 닿은 면 수 계산
+        for (int i = 1; i < N - 1; i++) {
+            for (int j = 1; j < M - 1; j++) {
+                if (map[i][j] > 0) {
+                    int sea = 0;
+                    for (int d = 0; d < 4; d++) {
+                        int nr = i + dr[d];
+                        int nc = j + dc[d];
+                        if (map[nr][nc] == 0) sea++;
+                    }
+                    melt[i][j] = sea;
+                }
+            }
         }
-        return count;
+        
+        // 높이 감소 적용
+        for (int i = 1; i < N - 1; i++) {
+            for (int j = 1; j < M - 1; j++) {
+                map[i][j] = Math.max(0, map[i][j] - melt[i][j]);
+            }
+        }
     }
-
+    
 }
