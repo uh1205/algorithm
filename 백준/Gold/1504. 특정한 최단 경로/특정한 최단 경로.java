@@ -2,19 +2,21 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static final int INF = 200_000_000;
+    static final int MAX_DIST = 200_000_000;
     static int N, E;
-    static List<List<Edge>> graph;
+    static int[] infArr, dist;
+    static List<List<Edge>> graph = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-
         N = Integer.parseInt(st.nextToken());
         E = Integer.parseInt(st.nextToken());
 
-        graph = new ArrayList<>(N + 1);
-        for (int i = 0; i <= N; i++) {
+        infArr = new int[N + 1];
+        Arrays.fill(infArr, MAX_DIST);
+
+        for (int i = 0; i < N + 1; i++) {
             graph.add(new ArrayList<>());
         }
 
@@ -23,6 +25,7 @@ public class Main {
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
+
             graph.get(a).add(new Edge(b, c));
             graph.get(b).add(new Edge(a, c));
         }
@@ -31,60 +34,59 @@ public class Main {
         int v1 = Integer.parseInt(st.nextToken());
         int v2 = Integer.parseInt(st.nextToken());
 
-        int[] dist1 = dijkstra(1);
-        int[] distV1 = dijkstra(v1);
-        int[] distV2 = dijkstra(v2);
+        // routeA: 1 -> v1 -> v2 -> N
+        // routeB: 1 -> v2 -> v1 -> N
+        int routeA = 0, routeB = 0;
 
-        int path1 = addIfPossible(dist1[v1], distV1[v2], distV2[N]);  // 1 → v1 → v2 → N
-        int path2 = addIfPossible(dist1[v2], distV2[v1], distV1[N]);  // 1 → v2 → v1 → N
+        dijkstra(1);
+        routeA += dist[v1];
+        routeB += dist[v2];
 
-        int answer = Math.min(path1, path2);
-        System.out.println(answer == INF ? -1 : answer);
+        dijkstra(v1);
+        routeA += dist[v2];
+        routeB += dist[N];
+
+        dijkstra(v2);
+        routeA += dist[N];
+        routeB += dist[v1];
+
+        int minDist = Math.min(routeA, routeB);
+        if (minDist >= MAX_DIST) System.out.println(-1);
+        else System.out.println(minDist);
     }
 
-    static int addIfPossible(int... values) {
-        int sum = 0;
-        for (int v : values) {
-            if (v >= INF) return INF;
-            sum += v;
-        }
-        return sum;
-    }
-
-    static int[] dijkstra(int start) {
+    static void dijkstra(int start) {
         PriorityQueue<Edge> pq = new PriorityQueue<>();
-        int[] dist = new int[N + 1];
-        Arrays.fill(dist, INF);
+        pq.add(new Edge(start, 0));
+        dist = infArr.clone();
         dist[start] = 0;
-        pq.offer(new Edge(start, 0));
 
         while (!pq.isEmpty()) {
             Edge cur = pq.poll();
-            if (dist[cur.node] < cur.dist) continue;
+
+            if (cur.dist > dist[cur.node]) continue;
 
             for (Edge next : graph.get(cur.node)) {
                 int nextDist = cur.dist + next.dist;
                 if (nextDist < dist[next.node]) {
                     dist[next.node] = nextDist;
-                    pq.offer(new Edge(next.node, nextDist));
+                    pq.add(new Edge(next.node, nextDist));
                 }
             }
         }
-
-        return dist;
     }
 
     static class Edge implements Comparable<Edge> {
         int node, dist;
 
-        Edge(int node, int dist) {
+        public Edge(int node, int dist) {
             this.node = node;
             this.dist = dist;
         }
 
         @Override
         public int compareTo(Edge o) {
-            return Integer.compare(this.dist, o.dist);
+            return this.dist - o.dist;
         }
     }
 }
