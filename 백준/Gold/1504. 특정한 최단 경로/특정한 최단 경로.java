@@ -3,9 +3,8 @@ import java.util.*;
 
 public class Main {
     static final int INF = 200_000_000;
-
     static int N, E;
-    static List<List<Edge>> graph = new ArrayList<>();
+    static List<List<Edge>> graph;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -14,6 +13,7 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         E = Integer.parseInt(st.nextToken());
 
+        graph = new ArrayList<>(N + 1);
         for (int i = 0; i <= N; i++) {
             graph.add(new ArrayList<>());
         }
@@ -23,7 +23,6 @@ public class Main {
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
-
             graph.get(a).add(new Edge(b, c));
             graph.get(b).add(new Edge(a, c));
         }
@@ -32,18 +31,18 @@ public class Main {
         int v1 = Integer.parseInt(st.nextToken());
         int v2 = Integer.parseInt(st.nextToken());
 
-        int[] distFrom1 = dijkstra(1);
-        int[] distFromV1 = dijkstra(v1);
-        int[] distFromV2 = dijkstra(v2);
+        int[] dist1 = dijkstra(1);
+        int[] distV1 = dijkstra(v1);
+        int[] distV2 = dijkstra(v2);
 
-        int routeA = safeAdd(distFrom1[v1], distFromV1[v2], distFromV2[N]);
-        int routeB = safeAdd(distFrom1[v2], distFromV2[v1], distFromV1[N]);
+        int path1 = addIfPossible(dist1[v1], distV1[v2], distV2[N]);  // 1 → v1 → v2 → N
+        int path2 = addIfPossible(dist1[v2], distV2[v1], distV1[N]);  // 1 → v2 → v1 → N
 
-        int min = Math.min(routeA, routeB);
-        System.out.println(min >= INF ? -1 : min);
+        int answer = Math.min(path1, path2);
+        System.out.println(answer == INF ? -1 : answer);
     }
 
-    static int safeAdd(int... values) {
+    static int addIfPossible(int... values) {
         int sum = 0;
         for (int v : values) {
             if (v >= INF) return INF;
@@ -64,10 +63,10 @@ public class Main {
             if (dist[cur.node] < cur.dist) continue;
 
             for (Edge next : graph.get(cur.node)) {
-                int newDist = cur.dist + next.dist;
-                if (newDist < dist[next.node]) {
-                    dist[next.node] = newDist;
-                    pq.offer(new Edge(next.node, newDist));
+                int nextDist = cur.dist + next.dist;
+                if (nextDist < dist[next.node]) {
+                    dist[next.node] = nextDist;
+                    pq.offer(new Edge(next.node, nextDist));
                 }
             }
         }
@@ -85,7 +84,7 @@ public class Main {
 
         @Override
         public int compareTo(Edge o) {
-            return this.dist - o.dist;
+            return Integer.compare(this.dist, o.dist);
         }
     }
 }
