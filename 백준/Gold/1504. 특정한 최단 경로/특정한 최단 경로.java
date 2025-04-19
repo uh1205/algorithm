@@ -3,16 +3,18 @@ import java.util.*;
 
 public class Main {
     static final int INF = 200_000_000;
+
     static int N, E;
     static List<List<Edge>> graph = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         N = Integer.parseInt(st.nextToken());
         E = Integer.parseInt(st.nextToken());
 
-        for (int i = 0; i < N + 1; i++) {
+        for (int i = 0; i <= N; i++) {
             graph.add(new ArrayList<>());
         }
 
@@ -21,6 +23,7 @@ public class Main {
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
+
             graph.get(a).add(new Edge(b, c));
             graph.get(b).add(new Edge(a, c));
         }
@@ -29,17 +32,27 @@ public class Main {
         int v1 = Integer.parseInt(st.nextToken());
         int v2 = Integer.parseInt(st.nextToken());
 
-        // 경로 1: 1 → v1 → v2 → N
-        int path1 = dijkstra(1, v1) + dijkstra(v1, v2) + dijkstra(v2, N);
+        int[] distFrom1 = dijkstra(1);
+        int[] distFromV1 = dijkstra(v1);
+        int[] distFromV2 = dijkstra(v2);
 
-        // 경로 2: 1 → v2 → v1 → N
-        int path2 = dijkstra(1, v2) + dijkstra(v2, v1) + dijkstra(v1, N);
+        int routeA = safeAdd(distFrom1[v1], distFromV1[v2], distFromV2[N]);
+        int routeB = safeAdd(distFrom1[v2], distFromV2[v1], distFromV1[N]);
 
-        int result = Math.min(path1, path2);
-        System.out.println(result >= INF ? -1 : result);
+        int min = Math.min(routeA, routeB);
+        System.out.println(min >= INF ? -1 : min);
     }
 
-    static int dijkstra(int start, int end) {
+    static int safeAdd(int... values) {
+        int sum = 0;
+        for (int v : values) {
+            if (v >= INF) return INF;
+            sum += v;
+        }
+        return sum;
+    }
+
+    static int[] dijkstra(int start) {
         PriorityQueue<Edge> pq = new PriorityQueue<>();
         int[] dist = new int[N + 1];
         Arrays.fill(dist, INF);
@@ -48,32 +61,31 @@ public class Main {
 
         while (!pq.isEmpty()) {
             Edge cur = pq.poll();
+            if (dist[cur.node] < cur.dist) continue;
 
-            if (dist[cur.to] < cur.cost) continue;
-
-            for (Edge next : graph.get(cur.to)) {
-                int newCost = dist[cur.to] + next.cost;
-
-                if (dist[next.to] > newCost) {
-                    dist[next.to] = newCost;
-                    pq.offer(new Edge(next.to, newCost));
+            for (Edge next : graph.get(cur.node)) {
+                int newDist = cur.dist + next.dist;
+                if (newDist < dist[next.node]) {
+                    dist[next.node] = newDist;
+                    pq.offer(new Edge(next.node, newDist));
                 }
             }
         }
 
-        return dist[end];
+        return dist;
     }
 
     static class Edge implements Comparable<Edge> {
-        int to, cost;
+        int node, dist;
 
-        public Edge(int to, int cost) {
-            this.to = to;
-            this.cost = cost;
+        Edge(int node, int dist) {
+            this.node = node;
+            this.dist = dist;
         }
 
+        @Override
         public int compareTo(Edge o) {
-            return this.cost - o.cost;
+            return this.dist - o.dist;
         }
     }
 }
