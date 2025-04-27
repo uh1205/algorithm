@@ -19,27 +19,19 @@ public class Main {
         boolean nFlag = false, pFlag = false;
 
         while (i <= j) {
-            if (arr[i] < 0) {
-                if (nFlag) sum += temp * arr[i]; // 짝지을 음수가 있는 경우 곱하기
-                else temp = arr[i]; // 없으면 임시로 저장
+            if (arr[i] <= 0) {
+                if (nFlag) sum += temp * arr[i];
+                else temp = arr[i];
                 nFlag = !nFlag;
                 i++;
-            } else if (arr[i] == 0) {
-                if (nFlag) temp = 0; // 하나 남은 음수와 0을 곱해서 더하기
-                i++;
             } else {
+                // 임시로 저장한 음수가 있는 경우
                 if (nFlag) {
-                    sum += temp; // 임시로 저장한 음수 더하기
+                    sum += temp;
                     nFlag = false;
                 }
-                // i: 양수 시작 인덱스, j: 양수 끝 인덱스
-                if (pFlag) {
-                    int s = temp + arr[j];
-                    int m = temp * arr[j];
-                    sum += Math.max(s, m); // 더하는 것과 곱하는 것 중 큰 값 더하기
-                } else {
-                    temp = arr[j];
-                }
+                if (pFlag) sum += Math.max(temp + arr[j], temp * arr[j]);
+                else temp = arr[j];
                 pFlag = !pFlag;
                 j--;
             }
