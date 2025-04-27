@@ -4,59 +4,49 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
         int N = Integer.parseInt(br.readLine());
 
-        List<Integer> plus = new ArrayList<>();
-        List<Integer> minus = new ArrayList<>();
-
-        int ones = 0;
-        int zeroCount = 0;
+        int[] arr = new int[N];
 
         for (int i = 0; i < N; i++) {
-            int num = Integer.parseInt(br.readLine());
-            if (num > 1) {
-                plus.add(num);
-            } else if (num == 1) {
-                ones++;
-            } else if (num == 0) {
-                zeroCount++;
-            } else {
-                minus.add(num);
-            }
+            arr[i] = Integer.parseInt(br.readLine());
         }
 
-        // 양수 > 1 내림차순 정렬
-        plus.sort(Collections.reverseOrder());
+        Arrays.sort(arr);
 
-        // 음수 오름차순 정렬
-        minus.sort(Comparator.naturalOrder());
+        int sum = 0, temp = 0;
+        int i = 0, j = arr.length - 1;
+        boolean nFlag = false, pFlag = false;
 
-        int sum = 0;
-
-        // 양수 묶기
-        for (int i = 0; i < plus.size(); i += 2) {
-            if (i + 1 < plus.size()) {
-                sum += plus.get(i) * plus.get(i + 1);
+        while (i <= j) {
+            if (arr[i] < 0) {
+                if (nFlag) sum += temp * arr[i]; // 짝지을 음수가 있는 경우 곱하기
+                else temp = arr[i]; // 없으면 임시로 저장
+                nFlag = !nFlag;
+                i++;
+            } else if (arr[i] == 0) {
+                if (nFlag) temp = 0; // 하나 남은 음수와 0을 곱해서 더하기
+                i++;
             } else {
-                sum += plus.get(i);
-            }
-        }
-
-        // 음수 묶기
-        for (int i = 0; i < minus.size(); i += 2) {
-            if (i + 1 < minus.size()) {
-                sum += minus.get(i) * minus.get(i + 1);
-            } else {
-                // 음수가 하나 남았는데 0이 있으면 곱해서 없애는 게 이득
-                if (zeroCount == 0) {
-                    sum += minus.get(i);
+                if (nFlag) {
+                    sum += temp; // 임시로 저장한 음수 더하기
+                    nFlag = false;
                 }
+                // i: 양수 시작 인덱스, j: 양수 끝 인덱스
+                if (pFlag) {
+                    int s = temp + arr[j];
+                    int m = temp * arr[j];
+                    sum += Math.max(s, m); // 더하는 것과 곱하는 것 중 큰 값 더하기
+                } else {
+                    temp = arr[j];
+                }
+                pFlag = !pFlag;
+                j--;
             }
         }
 
-        // 1은 무조건 더함
-        sum += ones;
+        // 임시값 더하기
+        if (nFlag || pFlag) sum += temp;
 
         System.out.println(sum);
     }
