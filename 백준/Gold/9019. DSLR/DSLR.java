@@ -5,12 +5,11 @@ public class Main {
     static final int MAX = 10000;
     static int[] from = new int[MAX];   // 이전 노드
     static char[] how = new char[MAX];  // 어떤 명령어로 왔는지
-    static boolean[] visited = new boolean[MAX];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int T = Integer.parseInt(br.readLine());
-
+        
         StringBuilder sb = new StringBuilder();
         while (T-- > 0) {
             StringTokenizer st = new StringTokenizer(br.readLine());
@@ -24,9 +23,10 @@ public class Main {
     }
 
     static String bfs(int start, int target) {
-        Arrays.fill(visited, false);
         Queue<Integer> q = new LinkedList<>();
         q.add(start);
+        
+        boolean[] visited = new boolean[MAX];
         visited[start] = true;
 
         from[start] = -1;
