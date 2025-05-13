@@ -2,76 +2,85 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
-    static String[] commands = {"D", "S", "L", "R"};
+    static final int MAX = 10000;
+    static int[] from = new int[MAX];   // 이전 노드
+    static char[] how = new char[MAX];  // 어떤 명령어로 왔는지
+    static boolean[] visited = new boolean[MAX];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
         int T = Integer.parseInt(br.readLine());
 
+        StringBuilder sb = new StringBuilder();
         while (T-- > 0) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             int A = Integer.parseInt(st.nextToken());
             int B = Integer.parseInt(st.nextToken());
 
-            System.out.println(bfs(A, B));
+            sb.append(bfs(A, B)).append("\n");
         }
+
+        System.out.print(sb);
     }
 
     static String bfs(int start, int target) {
-        boolean[] visited = new boolean[10000];
-        Queue<Node> queue = new LinkedList<>();
-
-        queue.offer(new Node(start, ""));
+        Arrays.fill(visited, false);
+        Queue<Integer> q = new LinkedList<>();
+        q.add(start);
         visited[start] = true;
 
-        while (!queue.isEmpty()) {
-            Node current = queue.poll();
+        from[start] = -1;
 
-            if (current.value == target) {
-                return current.commands;
-            }
+        while (!q.isEmpty()) {
+            int now = q.poll();
+
+            if (now == target) break;
 
             // D
-            int D = (current.value * 2) % 10000;
-            if (!visited[D]) {
-                visited[D] = true;
-                queue.offer(new Node(D, current.commands + "D"));
+            int next = (now * 2) % 10000;
+            if (!visited[next]) {
+                visited[next] = true;
+                q.add(next);
+                from[next] = now;
+                how[next] = 'D';
             }
 
             // S
-            int S = current.value == 0 ? 9999 : current.value - 1;
-            if (!visited[S]) {
-                visited[S] = true;
-                queue.offer(new Node(S, current.commands + "S"));
+            next = (now == 0) ? 9999 : now - 1;
+            if (!visited[next]) {
+                visited[next] = true;
+                q.add(next);
+                from[next] = now;
+                how[next] = 'S';
             }
 
             // L
-            int L = (current.value % 1000) * 10 + current.value / 1000;
-            if (!visited[L]) {
-                visited[L] = true;
-                queue.offer(new Node(L, current.commands + "L"));
+            next = (now % 1000) * 10 + now / 1000;
+            if (!visited[next]) {
+                visited[next] = true;
+                q.add(next);
+                from[next] = now;
+                how[next] = 'L';
             }
 
             // R
-            int R = (current.value % 10) * 1000 + current.value / 10;
-            if (!visited[R]) {
-                visited[R] = true;
-                queue.offer(new Node(R, current.commands + "R"));
+            next = (now % 10) * 1000 + now / 10;
+            if (!visited[next]) {
+                visited[next] = true;
+                q.add(next);
+                from[next] = now;
+                how[next] = 'R';
             }
         }
 
-        return "";
-    }
-
-    static class Node {
-        int value;
-        String commands;
-
-        Node(int value, String commands) {
-            this.value = value;
-            this.commands = commands;
+        // 명령어 경로 추적
+        StringBuilder sb = new StringBuilder();
+        int cur = target;
+        while (from[cur] != -1) {
+            sb.append(how[cur]);
+            cur = from[cur];
         }
+
+        return sb.reverse().toString();
     }
 }
