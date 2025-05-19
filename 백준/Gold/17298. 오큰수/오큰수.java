@@ -2,39 +2,36 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
 
-        int[] A = new int[N];
+        int[] arr = new int[N];
         int[] answer = new int[N];
-        StringTokenizer st = new StringTokenizer(br.readLine());
 
+        StringTokenizer st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
-            A[i] = Integer.parseInt(st.nextToken());
+            arr[i] = Integer.parseInt(st.nextToken());
         }
 
         Stack<Integer> stack = new Stack<>();
 
-        for (int i = N - 1; i >= 0; i--) {
-            while (!stack.isEmpty() && stack.peek() <= A[i]) {
-                stack.pop();
+        for (int i = 0; i < N; i++) {
+            while (!stack.isEmpty() && arr[stack.peek()] < arr[i]) {
+                answer[stack.pop()] = arr[i];
             }
+            stack.push(i);
+        }
 
-            if (stack.isEmpty()) {
-                answer[i] = -1;
-            } else {
-                answer[i] = stack.peek();
-            }
-
-            stack.push(A[i]);
+        while (!stack.isEmpty()) {
+            answer[stack.pop()] = -1;
         }
 
         StringBuilder sb = new StringBuilder();
-        for (int num : answer) {
-            sb.append(num).append(" ");
+        for (int val : answer) {
+            sb.append(val).append(' ');
         }
-        System.out.println(sb.toString().trim());
+
+        System.out.println(sb);
     }
 }
