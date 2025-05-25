@@ -2,17 +2,6 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
-    static class Tower {
-        int height;
-        int index;
-
-        Tower(int height, int index) {
-            this.height = height;
-            this.index = index;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
@@ -46,5 +35,15 @@ public class Main {
         }
 
         System.out.println(sb);
+    }
+    
+    static class Tower {
+        int height;
+        int index;
+
+        Tower(int height, int index) {
+            this.height = height;
+            this.index = index;
+        }
     }
 }
