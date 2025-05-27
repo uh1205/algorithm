@@ -29,8 +29,7 @@ public class Main {
         int len = dp.size(); // LIS 길이
         System.out.println(len);
 
-        // LIS 역추적
-        int[] LIS = new int[len];
+        int[] LIS = new int[len]; // 실제 LIS
         int cur = len - 1;
 
         for (int i = N - 1; i >= 0; i--) {
