@@ -2,27 +2,25 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
     static int[] parent;
     static int[] size;
-    static Map<String, Integer> map;
-    static int idx;
+    static Map<String, Integer> nameToId;
+    static int idCounter;
 
     public static void main(String[] args) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
+
         int T = Integer.parseInt(br.readLine());
 
         while (T-- > 0) {
             int F = Integer.parseInt(br.readLine());
+            parent = new int[2 * F];
+            size = new int[2 * F];
+            nameToId = new HashMap<>();
+            idCounter = 0;
 
-            parent = new int[F * 2];
-            size = new int[F * 2];
-            map = new HashMap<>();
-            idx = 0;
-
-            for (int i = 0; i < F * 2; i++) {
+            for (int i = 0; i < 2 * F; i++) {
                 parent[i] = i;
                 size[i] = 1;
             }
@@ -35,7 +33,7 @@ public class Main {
                 int id1 = getId(name1);
                 int id2 = getId(name2);
 
-                sb.append(union(id1, id2)).append("\n");
+                sb.append(union(id1, id2)).append('\n');
             }
         }
 
@@ -43,28 +41,27 @@ public class Main {
     }
 
     static int getId(String name) {
-        if (!map.containsKey(name)) {
-            map.put(name, idx++);
+        if (!nameToId.containsKey(name)) {
+            nameToId.put(name, idCounter++);
         }
-        return map.get(name);
+        return nameToId.get(name);
     }
 
     static int find(int x) {
-        if (x != parent[x]) {
-            parent[x] = find(parent[x]); // 경로 압축
-        }
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);
         return parent[x];
     }
 
-    static int union(int a, int b) {
-        int rootA = find(a);
-        int rootB = find(b);
+    static int union(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
 
-        if (rootA != rootB) {
-            parent[rootB] = rootA;
-            size[rootA] += size[rootB];
+        if (rootX != rootY) {
+            parent[rootY] = rootX;
+            size[rootX] += size[rootY];
         }
 
-        return size[find(rootA)];
+        return size[find(x)];
     }
 }
