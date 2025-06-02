@@ -2,13 +2,11 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int N, M, H;
-    static int[][][] map;
-    static int unripeCount = 0;
-    static Queue<int[]> q = new LinkedList<>();
-    static int[] dr = {0, 1, 0, -1, 0, 0};
-    static int[] dc = {1, 0, -1, 0, 0, 0};
-    static int[] dh = {0, 0, 0, 0, 1, -1};
+    static int M, N, H;
+    static int[][][] box;
+    static int[] dx = {1, -1, 0, 0, 0, 0};
+    static int[] dy = {0, 0, 1, -1, 0, 0};
+    static int[] dz = {0, 0, 0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -17,63 +15,61 @@ public class Main {
         N = Integer.parseInt(st.nextToken()); // 세로
         H = Integer.parseInt(st.nextToken()); // 높이
 
-        map = new int[N][M][H];
+        box = new int[M][N][H];
+        Queue<Tomato> q = new ArrayDeque<>();
 
-        for (int i = 0; i < H; i++) {
-            for (int j = 0; j < N; j++) {
+        for (int h = 0; h < H; h++) {
+            for (int n = 0; n < N; n++) {
                 st = new StringTokenizer(br.readLine());
-                for (int k = 0; k < M; k++) {
-                    int n = Integer.parseInt(st.nextToken());
-                    if (n == 0) {
-                        unripeCount++;
-                    } else if (n == 1) {
-                        q.add(new int[]{j, k, i});
+                for (int m = 0; m < M; m++) {
+                    box[m][n][h] = Integer.parseInt(st.nextToken());
+                    if (box[m][n][h] == 1) {
+                        q.add(new Tomato(m, n, h)); // 익은 토마토는 BFS 시작점
                     }
-                    map[j][k][i] = n;
                 }
             }
         }
-
-        if (unripeCount == 0) {
-            System.out.println(0);
-            return;
-        }
-
-        System.out.println(bfs());
-    }
-
-    static int bfs() {
-        int day = 0;
 
         while (!q.isEmpty()) {
-            int size = q.size();
-            for (int i = 0; i < size; i++) {
-                int[] cur = q.poll();
-                int cr = cur[0];
-                int cc = cur[1];
-                int ch = cur[2];
+            Tomato t = q.poll();
 
-                for (int d = 0; d < 6; d++) {
-                    int nr = cr + dr[d];
-                    int nc = cc + dc[d];
-                    int nh = ch + dh[d];
+            for (int d = 0; d < 6; d++) {
+                int nx = t.x + dx[d];
+                int ny = t.y + dy[d];
+                int nz = t.z + dz[d];
 
-                    if (nr < 0 || nc < 0 || nh < 0 ||
-                            nr >= N || nc >= M || nh >= H) {
-                        continue;
-                    }
+                if (nx < 0 || ny < 0 || nz < 0 || nx >= M || ny >= N || nz >= H) continue;
 
-                    if (map[nr][nc][nh] == 0) {
-                        map[nr][nc][nh] = 1;
-                        unripeCount--;
-                        q.add(new int[]{nr, nc, nh});
-                    }
+                if (box[nx][ny][nz] == 0) {
+                    box[nx][ny][nz] = box[t.x][t.y][t.z] + 1;
+                    q.add(new Tomato(nx, ny, nz));
                 }
             }
-
-            if (!q.isEmpty()) day++;
         }
 
-        return unripeCount == 0 ? day : -1;
+        int maxDay = 0;
+        for (int m = 0; m < M; m++) {
+            for (int n = 0; n < N; n++) {
+                for (int h = 0; h < H; h++) {
+                    if (box[m][n][h] == 0) {
+                        System.out.println(-1); // 익지 않은 토마토 남음
+                        return;
+                    }
+                    maxDay = Math.max(maxDay, box[m][n][h]);
+                }
+            }
+        }
+
+        System.out.println(maxDay - 1); // 1부터 시작했으므로 하루 빼줌
+    }
+
+    static class Tomato {
+        int x, y, z;
+
+        public Tomato(int x, int y, int z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
     }
 }
