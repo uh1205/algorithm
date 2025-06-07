@@ -2,100 +2,108 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
     static int R, C, T;
-    static int[][] map, temp;
-    static int airCleanerTop = -1;
-
-    static int[] dx = { -1, 1, 0, 0 };
-    static int[] dy = { 0, 0, -1, 1 };
+    static int[][] map;
+    static int purifierRow;
+    static int[] dr = {1, -1, 0, 0};
+    static int[] dc = {0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-
         R = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
         T = Integer.parseInt(st.nextToken());
 
         map = new int[R][C];
 
-        for (int i = 0; i < R; i++) {
+        for (int r = 0; r < R; r++) {
             st = new StringTokenizer(br.readLine());
-
-            for (int j = 0; j < C; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-
-                if (map[i][j] == -1 && airCleanerTop == -1) {
-                    airCleanerTop = i;
+            for (int c = 0; c < C; c++) {
+                map[r][c] = Integer.parseInt(st.nextToken());
+                if (map[r][c] == -1) {
+                    purifierRow = r; // 공기청정기 아래쪽 row
                 }
             }
         }
 
         while (T-- > 0) {
+            // 1. 미세먼지 확산
             spreadDust();
-            operateAirCleaner();
+
+            // 2. 공기청정기 작동
+            circulateAir();
         }
 
-        System.out.println(getTotalDust());
-    }
-
-    static void spreadDust() {
-        temp = new int[R][C];
-
-        for (int x = 0; x < R; x++) {
-            for (int y = 0; y < C; y++) {
-                if (map[x][y] > 0) {
-                    int spreadAmount = map[x][y] / 5;
-                    int count = 0;
-
-                    for (int d = 0; d < 4; d++) {
-                        int nx = x + dx[d];
-                        int ny = y + dy[d];
-
-                        if (nx >= 0 && nx < R && ny >= 0 && ny < C && map[nx][ny] != -1) {
-                            temp[nx][ny] += spreadAmount;
-                            count++;
-                        }
-                    }
-
-                    temp[x][y] += map[x][y] - (spreadAmount * count);
-                } else if (map[x][y] == -1) {
-                    temp[x][y] = -1;
+        int dust = 0;
+        for (int r = 0; r < R; r++) {
+            for (int c = 0; c < C; c++) {
+                if (map[r][c] > 0) {
+                    dust += map[r][c];
                 }
             }
         }
 
-        map = temp;
+        System.out.println(dust);
     }
 
-    static void operateAirCleaner() {
-        // 위쪽 (반시계방향)
-        for (int i = airCleanerTop - 1; i > 0; i--) map[i][0] = map[i - 1][0];
-        for (int i = 0; i < C - 1; i++) map[0][i] = map[0][i + 1];
-        for (int i = 0; i < airCleanerTop; i++) map[i][C - 1] = map[i + 1][C - 1];
-        for (int i = C - 1; i > 1; i--) map[airCleanerTop][i] = map[airCleanerTop][i - 1];
-        map[airCleanerTop][1] = 0;
+    static void spreadDust() {
+        int[][] copiedMap = copyMap();
 
-        // 아래쪽 (시계방향)
-        int bottom = airCleanerTop + 1;
-
-        for (int i = bottom + 1; i < R - 1; i++) map[i][0] = map[i + 1][0];
-        for (int i = 0; i < C - 1; i++) map[R - 1][i] = map[R - 1][i + 1];
-        for (int i = R - 1; i > bottom; i--) map[i][C - 1] = map[i - 1][C - 1];
-        for (int i = C - 1; i > 1; i--) map[bottom][i] = map[bottom][i - 1];
-        map[bottom][1] = 0;
-    }
-
-    static int getTotalDust() {
-        int sum = 0;
-
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                if (map[i][j] > 0) sum += map[i][j];
+        for (int r = 0; r < R; r++) {
+            for (int c = 0; c < C; c++) {
+                if (map[r][c] > 0) {
+                    int spread = map[r][c] / 5;
+                    int spreadCount = 0;
+                    for (int d = 0; d < 4; d++) {
+                        int nr = r + dr[d];
+                        int nc = c + dc[d];
+                        if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
+                        if (map[nr][nc] == -1) continue;
+                        copiedMap[nr][nc] += spread;
+                        spreadCount++;
+                    }
+                    copiedMap[r][c] -= spreadCount * spread;
+                }
             }
         }
+        map = copiedMap;
+    }
 
-        return sum;
+    static int[][] copyMap() {
+        int[][] copied = new int[R][C];
+        for (int i = 0; i < R; i++) {
+            copied[i] = map[i].clone();
+        }
+        return copied;
+    }
+
+    static void circulateAir() {
+        for (int r = purifierRow - 3; r >= 0; r--) {
+            map[r + 1][0] = map[r][0]; // 반시계 방향
+        }
+        for (int r = purifierRow + 2; r < R; r++) {
+            map[r - 1][0] = map[r][0]; // 시계 방향
+        }
+
+        for (int c = 1; c < C; c++) {
+            map[0][c - 1] = map[0][c]; // 반시계 방향
+            map[R - 1][c - 1] = map[R - 1][c]; // 시계 방향
+        }
+
+        for (int r = 1; r <= purifierRow - 1; r++) {
+            map[r - 1][C - 1] = map[r][C - 1]; // 반시계 방향
+        }
+        for (int r = R - 2; r >= purifierRow; r--) {
+            map[r + 1][C - 1] = map[r][C - 1]; // 시계 방향
+        }
+
+        for (int c = C - 2; c >= 1; c--) {
+            map[purifierRow - 1][c + 1] = map[purifierRow - 1][c]; // 반시계 방향
+            map[purifierRow][c + 1] = map[purifierRow][c]; // 시계 방향
+        }
+
+        map[purifierRow - 1][1] = 0;
+        map[purifierRow][1] = 0;
     }
 }
