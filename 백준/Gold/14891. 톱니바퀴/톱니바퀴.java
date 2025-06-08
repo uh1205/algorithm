@@ -2,64 +2,94 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
-    static Deque<Integer>[] gears = new Deque[4];
+    static char[][] gears = new char[5][8];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        // 톱니바퀴 초기 상태 입력
-        for (int i = 0; i < 4; i++) {
-            gears[i] = new ArrayDeque<>();
-            String line = br.readLine();
-            for (char c : line.toCharArray()) {
-                gears[i].addLast(c - '0');
-            }
+        for (int i = 1; i <= 4; i++) {
+            gears[i] = br.readLine().toCharArray();
         }
 
-        int k = Integer.parseInt(br.readLine());
+        int K = Integer.parseInt(br.readLine()); // 회전 횟수
 
-        while (k-- > 0) {
+        for (int i = 0; i < K; i++) {
+            char[][] copiedGears = copyGears();
+
             StringTokenizer st = new StringTokenizer(br.readLine());
-            int gearIdx = Integer.parseInt(st.nextToken()) - 1;
-            int direction = Integer.parseInt(st.nextToken());
+            int gearNum = Integer.parseInt(st.nextToken());
+            int direction = Integer.parseInt(st.nextToken()); // 1이면 시계, -1이면 반시계 방향
+            rotateGear(copiedGears[gearNum], direction);
 
-            int[] rotateDir = new int[4];
-            rotateDir[gearIdx] = direction;
-
-            // 왼쪽 전파
-            for (int i = gearIdx - 1; i >= 0; i--) {
-                if (gears[i].toArray()[2].equals(gears[i + 1].toArray()[6])) break;
-                rotateDir[i] = -rotateDir[i + 1];
+            int cur = gearNum;
+            int curDir = direction;
+            int left = gearNum - 1;
+            while (left >= 1) {
+                if (gears[cur][6] != gears[left][2]) {
+                    rotateGear(copiedGears[left], -curDir);
+                    cur = left;
+                    curDir = -curDir;
+                    left--;
+                } else {
+                    break;
+                }
             }
 
-            // 오른쪽 전파
-            for (int i = gearIdx + 1; i < 4; i++) {
-                if (gears[i - 1].toArray()[2].equals(gears[i].toArray()[6])) break;
-                rotateDir[i] = -rotateDir[i - 1];
+            cur = gearNum;
+            curDir = direction;
+            int right = gearNum + 1;
+            while (right <= 4) {
+                if (gears[cur][2] != gears[right][6]) {
+                    rotateGear(copiedGears[right], -curDir);
+                    cur = right;
+                    curDir = -curDir;
+                    right++;
+                } else {
+                    break;
+                }
             }
 
-            // 회전 실행
-            for (int i = 0; i < 4; i++) {
-                if (rotateDir[i] == 1) rotateClockwise(gears[i]);
-                else if (rotateDir[i] == -1) rotateCounterClockwise(gears[i]);
+            gears = copiedGears;
+        }
+
+        int total = 0;
+        for (int i = 1; i <= 4; i++) {
+            if (gears[i][0] == '1') {
+                total += (int) Math.pow(2, i - 1);
             }
         }
 
-        // 점수 계산 (12시방향이 1인 톱니: 1, 2, 4, 8 점)
-        int score = 0;
-        for (int i = 0; i < 4; i++) {
-            if (gears[i].peekFirst() == 1) score += (1 << i);
+        System.out.println(total);
+    }
+
+    static char[][] copyGears() {
+        char[][] copied = new char[5][8];
+        for (int i = 0; i < copied.length; i++) {
+            copied[i] = gears[i].clone();
         }
-
-        System.out.println(score);
+        return copied;
     }
 
-    static void rotateClockwise(Deque<Integer> dq) {
-        dq.addFirst(dq.pollLast());
+    static void rotateGear(char[] arr, int direction) {
+        if (direction == 1) rotateRight(arr);
+        else rotateLeft(arr);
     }
 
-    static void rotateCounterClockwise(Deque<Integer> dq) {
-        dq.addLast(dq.pollFirst());
+    // 시계 방향 회전: 오른쪽으로 한 칸 이동
+    static void rotateRight(char[] arr) {
+        char last = arr[7];
+        for (int i = 7; i >= 1; i--) {
+            arr[i] = arr[i - 1];
+        }
+        arr[0] = last;
+    }
+
+    // 반시계 방향 회전: 왼쪽으로 한 칸 이동
+    static void rotateLeft(char[] arr) {
+        char first = arr[0];
+        for (int i = 0; i <= 6; i++) {
+            arr[i] = arr[i + 1];
+        }
+        arr[7] = first;
     }
 }
