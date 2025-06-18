@@ -2,73 +2,44 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static BufferedReader br;
-    static BufferedWriter bw;
-    static int T;
-
     public static void main(String[] args) throws IOException {
-        br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        T = Integer.parseInt(br.readLine());
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+        int T = Integer.parseInt(br.readLine());
 
         while (T-- > 0) {
             int k = Integer.parseInt(br.readLine());
-
-            PriorityQueue<Integer> minHeap = new PriorityQueue<>();
-            PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
-            Map<Integer, Integer> countMap = new HashMap<>();
+            TreeMap<Integer, Integer> map = new TreeMap<>();
 
             for (int i = 0; i < k; i++) {
-                String[] command = br.readLine().split(" ");
-                char op = command[0].charAt(0);
-                int num = Integer.parseInt(command[1]);
+                StringTokenizer st = new StringTokenizer(br.readLine());
+                char cmd = st.nextToken().charAt(0);
+                int n = Integer.parseInt(st.nextToken());
 
-                if (op == 'I') {
-                    minHeap.offer(num);
-                    maxHeap.offer(num);
-                    countMap.put(num, countMap.getOrDefault(num, 0) + 1);
-                } else if (op == 'D') {
-                    if (num == 1) {
-                        remove(maxHeap, countMap);
+                if (cmd == 'I') {
+                    map.put(n, map.getOrDefault(n, 0) + 1); // 있으면 n + 1, 없으면 0 + 1
+                } else if (cmd == 'D') {
+                    if (map.isEmpty()) continue;
+
+                    // n이 1이면 최댓값, -1이면 최솟값 제거
+                    int key = (n == 1) ? map.lastKey() : map.firstKey();
+
+                    // 남은 개수가 1개면 remove, 아니면 -1
+                    if (map.get(key) == 1) {
+                        map.remove(key);
                     } else {
-                        remove(minHeap, countMap);
+                        map.put(key, map.get(key) - 1);
                     }
                 }
             }
 
-            Integer max = getValidTop(maxHeap, countMap);
-            Integer min = getValidTop(minHeap, countMap);
-
-            if (max == null || min == null) {
-                bw.write("EMPTY\n");
+            if (map.isEmpty()) {
+                sb.append("EMPTY\n");
             } else {
-                bw.write(max + " " + min + "\n");
+                sb.append(map.lastKey()).append(' ').append(map.firstKey()).append('\n');
             }
         }
-        bw.flush();
-        bw.close();
-        br.close();
-    }
 
-    // 유효한 값 삭제
-    static void remove(PriorityQueue<Integer> pq, Map<Integer, Integer> map) {
-        while (!pq.isEmpty()) {
-            int val = pq.poll();
-            if (map.containsKey(val)) {
-                map.put(val, map.get(val) - 1);
-                if (map.get(val) == 0) map.remove(val);
-                break;
-            }
-        }
-    }
-
-    // 유효한 top 값 반환
-    static Integer getValidTop(PriorityQueue<Integer> pq, Map<Integer, Integer> map) {
-        while (!pq.isEmpty()) {
-            int val = pq.peek();
-            if (map.containsKey(val)) return val;
-            pq.poll();
-        }
-        return null;
+        System.out.print(sb);
     }
 }
