@@ -1,14 +1,12 @@
 import java.io.*;
 
 public class Main {
-    static int N;
-    static long K;
+    static int N, k;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         N = Integer.parseInt(br.readLine());
-        K = Long.parseLong(br.readLine());
+        k = Integer.parseInt(br.readLine());
 
         long left = 1;
         long right = (long) N * N;
@@ -17,7 +15,7 @@ public class Main {
         while (left <= right) {
             long mid = (left + right) / 2;
 
-            if (countLessOrEqual(mid) >= K) {
+            if (countLessOrEqual(mid) >= k) {
                 answer = mid;
                 right = mid - 1; // 더 작은 값도 가능한지 탐색
             } else {
