@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
-
         N = Integer.parseInt(br.readLine());
+       
         arr = new int[N + 1];
         dp = new int[N + 1][N + 1];
 
