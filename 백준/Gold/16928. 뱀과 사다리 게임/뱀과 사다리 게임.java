@@ -9,7 +9,6 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
 
-        // 초기화
         for (int i = 1; i <= 100; i++) map[i] = i;
 
         st = new StringTokenizer(br.readLine());
