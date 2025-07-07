@@ -7,6 +7,7 @@ public class Main {
         int N = Integer.parseInt(br.readLine());
 
         int[] weights = new int[N];
+
         StringTokenizer st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             weights[i] = Integer.parseInt(st.nextToken());
@@ -14,8 +15,8 @@ public class Main {
 
         Arrays.sort(weights);
 
-        long target = 1; // 만들 수 없는 최소 무게
-
+        int target = 1; // 만들 수 없는 가장 작은 무게
+        
         for (int w : weights) {
             if (w > target) break;
             target += w;
