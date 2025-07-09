@@ -1,36 +1,49 @@
 import java.io.*;
+import java.util.*;
 
 public class Main {
-    static int[] preorder = new int[10001];
-    static int idx = 0;
+    static int[] preorder;
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        List<Integer> list = new ArrayList<>();
         String line;
+
         while ((line = br.readLine()) != null && !line.isEmpty()) {
-            preorder[idx++] = Integer.parseInt(line);
+            list.add(Integer.parseInt(line));
         }
 
-        postOrder(0, idx - 1);
+        preorder = new int[list.size()];
+
+        for (int i = 0; i < list.size(); i++) {
+            preorder[i] = list.get(i);
+        }
+
+        postorder(0, preorder.length - 1);
+
+        System.out.print(sb);
     }
 
-    // 후위 순회 출력
-    static void postOrder(int start, int end) {
+    static void postorder(int start, int end) {
         if (start > end) return;
 
         int root = preorder[start];
         int mid = start + 1;
 
-        // 왼쪽 서브트리 범위 탐색 (root보다 작을 때까지)
+        // 오른쪽 서브트리 시작점 찾기
         while (mid <= end && preorder[mid] < root) {
             mid++;
         }
 
-        // 왼쪽 재귀
-        postOrder(start + 1, mid - 1);
-        // 오른쪽 재귀
-        postOrder(mid, end);
-        // 루트 출력
-        System.out.println(root);
+        // 왼쪽 서브트리
+        postorder(start + 1, mid - 1);
+
+        // 오른쪽 서브트리
+        postorder(mid, end);
+
+        // 후위 순회: 루트 마지막
+        sb.append(root).append('\n');
     }
 }
