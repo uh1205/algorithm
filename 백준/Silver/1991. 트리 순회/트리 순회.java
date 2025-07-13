@@ -1,69 +1,53 @@
 import java.io.*;
-import java.util.*;
 
 public class Main {
-    static Node[] tree;
-    static StringBuilder pre = new StringBuilder();
-    static StringBuilder in = new StringBuilder();
-    static StringBuilder post = new StringBuilder();
+    static int[] left = new int[26];
+    static int[] right = new int[26];
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
 
-        tree = new Node[26];
-
-        for (int i = 0; i < tree.length; i++) {
-            tree[i] = new Node();
-        }
-
         for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            char node = st.nextToken().charAt(0);
-            char left = st.nextToken().charAt(0);
-            char right = st.nextToken().charAt(0);
+            String[] input = br.readLine().split(" ");
+            int root = input[0].charAt(0) - 'A';
+            char l = input[1].charAt(0);
+            char r = input[2].charAt(0);
 
-            tree[node - 'A'].left = left;
-            tree[node - 'A'].right = right;
+            left[root] = (l == '.') ? -1 : l - 'A';
+            right[root] = (r == '.') ? -1 : r - 'A';
         }
 
-        preorder('A');
-        inorder('A');
-        postorder('A');
+        preorder(0);
+        sb.append('\n');
 
-        System.out.println(pre);
-        System.out.println(in);
-        System.out.println(post);
+        inorder(0);
+        sb.append('\n');
+
+        postorder(0);
+
+        System.out.print(sb);
     }
 
-    static void preorder(char node) {
-        if (node == '.') return;
-        pre.append(node);
-        preorder(tree[node - 'A'].left);
-        preorder(tree[node - 'A'].right);
+    static void preorder(int node) {
+        if (node == -1) return;
+        sb.append((char) (node + 'A'));
+        preorder(left[node]);
+        preorder(right[node]);
     }
 
-    static void inorder(char node) {
-        if (node == '.') return;
-        inorder(tree[node - 'A'].left);
-        in.append(node);
-        inorder(tree[node - 'A'].right);
+    static void inorder(int node) {
+        if (node == -1) return;
+        inorder(left[node]);
+        sb.append((char) (node + 'A'));
+        inorder(right[node]);
     }
 
-    static void postorder(char node) {
-        if (node == '.') return;
-        postorder(tree[node - 'A'].left);
-        postorder(tree[node - 'A'].right);
-        post.append(node);
-    }
-
-    static class Node {
-        char left;
-        char right;
-
-        Node() {
-            this.left = '.';
-            this.right = '.';
-        }
+    static void postorder(int node) {
+        if (node == -1) return;
+        postorder(left[node]);
+        postorder(right[node]);
+        sb.append((char) (node + 'A'));
     }
 }
