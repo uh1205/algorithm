@@ -1,43 +1,55 @@
 import java.io.*;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
         int T = Integer.parseInt(br.readLine());
 
-        StringBuilder sb = new StringBuilder();
         while (T-- > 0) {
             String str = br.readLine();
-            sb.append(checkPalindrome(str)).append('\n');
+            sb.append(judgePalindrome(str)).append('\n');
         }
-        System.out.print(sb);
+
+        System.out.println(sb);
     }
 
-    static int checkPalindrome(String str) {
+    // 회문이면 0, 유사회문이면 1, 그 외는 2 return
+    static int judgePalindrome(String str) {
         int left = 0;
         int right = str.length() - 1;
 
         while (left < right) {
-            if (str.charAt(left) == str.charAt(right)) {
-                left++;
-                right--;
-            } else {
-                // 한 문자 제거하고 회문인지 확인
-                if (isPalindrome(str, left + 1, right) || isPalindrome(str, left, right - 1)) {
-                    return 1; // 유사회문
+            if (str.charAt(left) != str.charAt(right)) {
+                // 왼쪽 문자 생략 후 남은 부분이 회문인지 확인
+                boolean b1 = checkPalindrome(str, left + 1, right);
+
+                // 오른쪽 문자 생략 후 남은 부분이 회문인지 확인
+                boolean b2 = checkPalindrome(str, left, right - 1);
+
+                // 둘 중 하나라도 참이면 유사회문(1), 아니면 일반 문자열(2)
+                if (b1 || b2) {
+                    return 1;
                 } else {
-                    return 2; // 일반 문자열
+                    return 2;
                 }
             }
+            
+            left++;
+            right--;
         }
-        return 0; // 완전한 회문
+        
+        return 0;
     }
 
-    static boolean isPalindrome(String str, int left, int right) {
+    static boolean checkPalindrome(String str, int left, int right) {
         while (left < right) {
-            if (str.charAt(left++) != str.charAt(right--)) {
+            if (str.charAt(left) != str.charAt(right)) {
                 return false;
             }
+            left++;
+            right--;
         }
         return true;
     }
