@@ -3,98 +3,73 @@ import java.util.*;
 
 public class Main {
     static final int INF = Integer.MAX_VALUE;
-    static int[][] map;
-    static int[] dist;
-    static List<List<Edge>> graph;
-    static StringBuilder sb = new StringBuilder();
+    static int[][] map, dist;
+    static int N;
+    static int[] dx = {-1, 1, 0, 0};
+    static int[] dy = {0, 0, -1, 1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int T = 0;
-        int N;
+        int testCase = 1;
 
-        while ((N = Integer.parseInt(br.readLine())) != 0) {
-            T++;
+        while (true) {
+            N = Integer.parseInt(br.readLine());
+            if (N == 0) break;
+
             map = new int[N][N];
-            dist = new int[N * N];
-            graph = new ArrayList<>();
+            dist = new int[N][N];
 
-            for (int r = 0; r < N; r++) {
+            for (int i = 0; i < N; i++) {
                 StringTokenizer st = new StringTokenizer(br.readLine());
-                for (int c = 0; c < N; c++) {
-                    map[r][c] = Integer.parseInt(st.nextToken());
-                    dist[N * r + c] = INF;
-                    graph.add(new ArrayList<>());
-                }
-            }
-
-            for (int r = 0; r < N; r++) {
-                for (int c = 0; c < N; c++) {
-                    int now = N * r + c;
-
-                    if (c + 1 < N) { // 오른쪽
-                        graph.get(now).add(new Edge(now + 1, map[r][c + 1]));
-                    }
-
-                    if (r + 1 < N) { // 아래
-                        graph.get(now).add(new Edge(now + N, map[r + 1][c]));
-                    }
-
-                    if (c - 1 >= 0) { // 왼쪽
-                        graph.get(now).add(new Edge(now - 1, map[r][c - 1]));
-                    }
-
-                    if (r - 1 >= 0) { // 위
-                        graph.get(now).add(new Edge(now - N, map[r - 1][c]));
-                    }
+                for (int j = 0; j < N; j++) {
+                    map[i][j] = Integer.parseInt(st.nextToken());
+                    dist[i][j] = INF;
                 }
             }
 
             dijkstra();
 
-            sb.append("Problem ").append(T).append(": ");
-            sb.append(dist[N * N - 1]).append('\n');
+            System.out.println("Problem " + testCase++ + ": " + dist[N - 1][N - 1]);
         }
-
-        System.out.println(sb);
     }
 
     static void dijkstra() {
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.add(new Edge(0, map[0][0]));
-        dist[0] = map[0][0];
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        pq.offer(new Node(0, 0, map[0][0]));
+        dist[0][0] = map[0][0];
 
         while (!pq.isEmpty()) {
-            Edge cur = pq.poll();
-            int cn = cur.node;
-            int cw = cur.weight;
+            Node cur = pq.poll();
 
-            if (cw > dist[cn]) continue;
+            if (cur.cost > dist[cur.x][cur.y]) continue;
 
-            for (Edge e : graph.get(cn)) {
-                int nn = e.node;
-                int nw = cw + e.weight;
+            for (int d = 0; d < 4; d++) {
+                int nx = cur.x + dx[d];
+                int ny = cur.y + dy[d];
 
-                if (nw < dist[nn]) {
-                    dist[nn] = nw;
-                    pq.add(new Edge(nn, nw));
+                if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+
+                int newCost = cur.cost + map[nx][ny];
+
+                if (newCost < dist[nx][ny]) {
+                    dist[nx][ny] = newCost;
+                    pq.offer(new Node(nx, ny, newCost));
                 }
             }
         }
     }
 
-    static class Edge implements Comparable<Edge> {
-        int node;
-        int weight;
+    static class Node implements Comparable<Node> {
+        int x, y, cost;
 
-        public Edge(int node, int weight) {
-            this.node = node;
-            this.weight = weight;
+        Node(int x, int y, int cost) {
+            this.x = x;
+            this.y = y;
+            this.cost = cost;
         }
 
-        @Override
-        public int compareTo(Edge o) {
-            return this.weight - o.weight;
+        public int compareTo(Node other) {
+            return Integer.compare(this.cost, other.cost);
         }
     }
 }
