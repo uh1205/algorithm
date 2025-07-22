@@ -3,10 +3,11 @@ import java.util.*;
 
 public class Main {
     static final int INF = Integer.MAX_VALUE;
-    static int[][] map, dist;
     static int N;
-    static int[] dx = {-1, 1, 0, 0};
-    static int[] dy = {0, 0, -1, 1};
+    static int[][] map, dist;
+    static int[] dr = {-1, 1, 0, 0};
+    static int[] dc = {0, 0, -1, 1};
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -29,47 +30,53 @@ public class Main {
 
             dijkstra();
 
-            System.out.println("Problem " + testCase++ + ": " + dist[N - 1][N - 1]);
+            sb.append("Problem ").append(testCase++).append(": ");
+            sb.append(dist[N - 1][N - 1]).append('\n');
         }
+
+        System.out.println(sb);
     }
 
     static void dijkstra() {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        pq.offer(new Node(0, 0, map[0][0]));
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        pq.add(new Edge(0, 0, map[0][0]));
         dist[0][0] = map[0][0];
 
         while (!pq.isEmpty()) {
-            Node cur = pq.poll();
-
-            if (cur.cost > dist[cur.x][cur.y]) continue;
+            Edge cur = pq.poll();
+            int cr = cur.r;
+            int cc = cur.c;
+            int cw = cur.weight;
 
             for (int d = 0; d < 4; d++) {
-                int nx = cur.x + dx[d];
-                int ny = cur.y + dy[d];
+                int nr = cr + dr[d];
+                int nc = cc + dc[d];
 
-                if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+                if (nr < 0 || nc < 0 || nr >= N || nc >= N) continue;
+                if (cw > dist[cr][cc]) continue;
 
-                int newCost = cur.cost + map[nx][ny];
+                int nw = cw + map[nr][nc];
 
-                if (newCost < dist[nx][ny]) {
-                    dist[nx][ny] = newCost;
-                    pq.offer(new Node(nx, ny, newCost));
+                if (nw < dist[nr][nc]) {
+                    dist[nr][nc] = nw;
+                    pq.add(new Edge(nr, nc, nw));
                 }
             }
         }
     }
 
-    static class Node implements Comparable<Node> {
-        int x, y, cost;
+    static class Edge implements Comparable<Edge> {
+        int r, c, weight;
 
-        Node(int x, int y, int cost) {
-            this.x = x;
-            this.y = y;
-            this.cost = cost;
+        public Edge(int r, int c, int weight) {
+            this.r = r;
+            this.c = c;
+            this.weight = weight;
         }
 
-        public int compareTo(Node other) {
-            return Integer.compare(this.cost, other.cost);
+        @Override
+        public int compareTo(Edge o) {
+            return this.weight - o.weight;
         }
     }
 }
