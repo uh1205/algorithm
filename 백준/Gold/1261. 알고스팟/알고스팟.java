@@ -41,12 +41,13 @@ public class Main {
             int cc = cur.c;
             int cw = cur.w;
 
+            if (cw > dist[cr][cc]) continue;
+
             for (int d = 0; d < 4; d++) {
                 int nr = cr + dr[d];
                 int nc = cc + dc[d];
 
                 if (nr < 0 || nc < 0 || nr >= R || nc >= C) continue;
-                if (cw > dist[cr][cc]) continue;
 
                 int nw = cw + map[nr][nc];
 
