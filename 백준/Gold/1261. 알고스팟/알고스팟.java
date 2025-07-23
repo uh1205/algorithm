@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static final int INF = Integer.MAX_VALUE;
     static int R, C;
     static int[][] map;
     static boolean[][] visited;
@@ -29,12 +28,12 @@ public class Main {
     }
 
     static int bfs() {
-        Deque<Edge> dq = new ArrayDeque<>();
-        dq.add(new Edge(0, 0, 0));
+        Deque<Point> dq = new ArrayDeque<>();
+        dq.add(new Point(0, 0, 0));
         visited[0][0] = true;
 
         while (!dq.isEmpty()) {
-            Edge cur = dq.poll();
+            Point cur = dq.poll();
             int cr = cur.r;
             int cc = cur.c;
             int cw = cur.w;
@@ -53,9 +52,9 @@ public class Main {
                 visited[nr][nc] = true;
 
                 if (map[nr][nc] == 0) {
-                    dq.addFirst(new Edge(nr, nc, cw));
+                    dq.addFirst(new Point(nr, nc, cw));
                 } else {
-                    dq.addLast(new Edge(nr, nc, cw + 1));
+                    dq.addLast(new Point(nr, nc, cw + 1));
                 }
             }
         }
@@ -63,10 +62,10 @@ public class Main {
         return -1;
     }
 
-    static class Edge {
+    static class Point {
         int r, c, w;
 
-        public Edge(int r, int c, int w) {
+        public Point(int r, int c, int w) {
             this.r = r;
             this.c = c;
             this.w = w;
