@@ -74,7 +74,6 @@ public class Main {
             this.weight = weight;
         }
 
-        @Override
         public int compareTo(Edge o) {
             return this.weight - o.weight;
         }
