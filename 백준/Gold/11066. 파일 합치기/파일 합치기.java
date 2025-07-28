@@ -20,16 +20,25 @@ public class Main {
                 prefixSum[i] = prefixSum[i - 1] + arr[i];
             }
 
-            int[][] dp = new int[K + 1][K + 1];
+            int[][] dp = new int[K + 2][K + 2];
+            int[][] opt = new int[K + 2][K + 2]; // 최소가 되는 k를 저장
+
+            for (int i = 1; i <= K; i++) {
+                opt[i][i] = i;
+            }
 
             for (int len = 1; len < K; len++) {
-                for (int i = 1; i <= K - len; i++) {
+                for (int i = 1; i + len <= K; i++) {
                     int j = i + len;
                     dp[i][j] = Integer.MAX_VALUE;
 
-                    for (int k = i; k < j; k++) {
-                        dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k + 1][j]
-                                + prefixSum[j] - prefixSum[i - 1]);
+                    // Knuth 최적화: k 범위를 줄임
+                    for (int k = opt[i][j - 1]; k <= opt[i + 1][j]; k++) {
+                        int cost = dp[i][k] + dp[k + 1][j] + prefixSum[j] - prefixSum[i - 1];
+                        if (cost < dp[i][j]) {
+                            dp[i][j] = cost;
+                            opt[i][j] = k;
+                        }
                     }
                 }
             }
