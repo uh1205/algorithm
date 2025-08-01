@@ -9,16 +9,14 @@ public class Main {
         int M = Integer.parseInt(st.nextToken());
 
         int[][] map = new int[N + 1][N + 1];
-        int[][] sum = new int[N + 1][N + 1]; // (1,1) ~ (r,c) 사각형 합
+        int[][] sum = new int[N + 1][N + 1];
 
-        for (int r = 1; r <= N; r++) {
+        for (int i = 1; i <= N; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int c = 1; c <= N; c++) {
-                map[r][c] = Integer.parseInt(st.nextToken());
-                sum[r][c] = sum[r - 1][c] 
-                        + sum[r][c - 1]
-                        - sum[r - 1][c - 1]
-                        + map[r][c];
+            for (int j = 1; j <= N; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+                sum[i][j] = sum[i - 1][j] + sum[i][j - 1]
+                        - sum[i - 1][j - 1] + map[i][j];
             }
         }
 
@@ -31,11 +29,10 @@ public class Main {
             int r2 = Integer.parseInt(st.nextToken());
             int c2 = Integer.parseInt(st.nextToken());
 
-            int result = sum[r2][c2] 
-                    - sum[r2][c1 - 1]
-                    - sum[r1 - 1][c2] 
+            int result = sum[r2][c2]
+                    - sum[r2][c1 - 1] - sum[r1 - 1][c2] 
                     + sum[r1 - 1][c1 - 1];
-            
+
             sb.append(result).append('\n');
         }
 
