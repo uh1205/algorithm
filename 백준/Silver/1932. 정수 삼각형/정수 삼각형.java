@@ -1,26 +1,32 @@
 import java.io.*;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
 
-        int[][] triangle = new int[n][n];
-        for (int i = 0; i < n; i++) {
+        int[][] map = new int[n + 1][n + 1];
+
+        for (int i = 1; i <= n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            for (int j = 0; j <= i; j++) {
-                triangle[i][j] = Integer.parseInt(st.nextToken());
+            for (int j = 1; j <= i; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        // 하단에서부터 위로 DP 수행
-        for (int i = n - 2; i >= 0; i--) {
-            for (int j = 0; j <= i; j++) {
-                triangle[i][j] += Math.max(triangle[i + 1][j], triangle[i + 1][j + 1]);
+        int[][] dp = new int[n + 1][n + 1];
+
+        for (int i = 1; i <= n; i++) {
+            dp[n][i] = map[n][i];
+        }
+
+        for (int i = n - 1; i >= 1; i--) {
+            for (int j = 1; j <= i; j++) {
+                dp[i][j] = Math.max(dp[i + 1][j], dp[i + 1][j + 1]) + map[i][j];
             }
         }
 
-        System.out.println(triangle[0][0]);
+        System.out.println(dp[1][1]);
     }
 }
