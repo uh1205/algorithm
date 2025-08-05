@@ -25,16 +25,12 @@ public class Main {
             dp[0][1] = map[0][1];
             dp[1][1] = map[1][1];
 
-            int result = Math.max(dp[0][1], dp[1][1]);
-
             for (int i = 2; i <= n; i++) {
                 dp[0][i] = map[0][i] + Math.max(dp[1][i - 1], dp[1][i - 2]);
                 dp[1][i] = map[1][i] + Math.max(dp[0][i - 1], dp[0][i - 2]);
-                
-                result = Math.max(result, Math.max(dp[0][i], dp[1][i]));
             }
 
-            sb.append(result).append('\n');
+            sb.append(Math.max(dp[0][n], dp[1][n])).append('\n');
         }
 
         System.out.println(sb);
