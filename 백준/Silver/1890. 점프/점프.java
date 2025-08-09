@@ -22,13 +22,11 @@ public class Main {
 
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (dp[i][j] == 0) continue;
-
-                int dist = map[i][j];
-                if (dist != 0) {
-                    if (i + dist < N) dp[i + dist][j] += dp[i][j];
-                    if (j + dist < N) dp[i][j + dist] += dp[i][j];
-                }
+                int jump = map[i][j];
+                if (jump == 0 || dp[i][j] == 0) continue;
+                
+                if (i + jump < N) dp[i + jump][j] += dp[i][j];
+                if (j + jump < N) dp[i][j + jump] += dp[i][j];
             }
         }
 
