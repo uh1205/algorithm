@@ -6,63 +6,41 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
 
-        // dp[i][0] = 숫자 i를 만드는데 걸린 최소 연산 수
-        // dp[i][1] = 이전 수 (어디서 왔는지 기록)
-        int[][] dp = new int[N + 1][2];
+        int[] dp = new int[N + 1];      // 최소 연산 횟수 저장
+        int[] prev = new int[N + 1];    // 이전 값 저장 (경로 추적용)
 
-        for (int i = 1; i <= N; i++) {
-            dp[i][0] = Integer.MAX_VALUE;
-        }
+        Arrays.fill(dp, Integer.MAX_VALUE);
+        dp[1] = 0; // 1은 연산이 필요 없음
 
-        dp[N][0] = 0;
-
-        for (int i = N; i > 1; i--) {
-            int curOpCnt = dp[i][0];
-            int nextPos;
-
-            // 3으로 나누기
-            if (i % 3 == 0) {
-                nextPos = i / 3;
-                if (curOpCnt + 1 < dp[nextPos][0]) {
-                    dp[nextPos][0] = curOpCnt + 1;
-                    dp[nextPos][1] = i;
-                }
+        for (int i = 2; i <= N; i++) {
+            // 1을 뺀 경우
+            if (dp[i] > dp[i - 1] + 1) {
+                dp[i] = dp[i - 1] + 1;
+                prev[i] = i - 1;
             }
-
-            // 2로 나누기
-            if (i % 2 == 0) {
-                nextPos = i / 2;
-                if (curOpCnt + 1 < dp[nextPos][0]) {
-                    dp[nextPos][0] = curOpCnt + 1;
-                    dp[nextPos][1] = i;
-                }
+            // 2로 나누는 경우
+            if (i % 2 == 0 && dp[i] > dp[i / 2] + 1) {
+                dp[i] = dp[i / 2] + 1;
+                prev[i] = i / 2;
             }
-
-            // 1 빼기
-            nextPos = i - 1;
-            if (curOpCnt + 1 < dp[nextPos][0]) {
-                dp[nextPos][0] = curOpCnt + 1;
-                dp[nextPos][1] = i;
+            // 3으로 나누는 경우
+            if (i % 3 == 0 && dp[i] > dp[i / 3] + 1) {
+                dp[i] = dp[i / 3] + 1;
+                prev[i] = i / 3;
             }
         }
 
-        int result = dp[1][0];
-        System.out.println(result);
+        // 최소 연산 횟수 출력
+        System.out.println(dp[N]);
 
-        // 역추적
-        Deque<Integer> stack = new ArrayDeque<>();
-        int num = 1;
-
-        for (int i = 0; i < result + 1; i++) {
-            stack.push(num);
-            num = dp[num][1]; // 이전 수
-        }
-
+        // 경로 추적
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < result + 1; i++) {
-            sb.append(stack.pop()).append(' ');
+        int cur = N;
+        while (cur != 0) {
+            sb.append(cur).append(" ");
+            if (cur == 1) break;
+            cur = prev[cur];
         }
-
         System.out.println(sb);
     }
 }
