@@ -4,9 +4,8 @@ import java.util.*;
 public class Main {
     static int N, L;
     static int[][] map;
-    static boolean[][] installed;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
@@ -14,86 +13,65 @@ public class Main {
 
         map = new int[N][N];
 
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
-
-        int result = 0;
-
-        // 가로 길 찾기
-        installed = new boolean[N][N];
         for (int r = 0; r < N; r++) {
-            boolean passable = true;
-            int prev = map[r][0];
-
-            for (int c = 1; c < N; c++) {
-                int cur = map[r][c];
-
-                if (prev < cur) {
-                    if (!checkRowSame(r, c - L, cur - 1)) {
-                        passable = false;
-                        break;
-                    }
-                } else if (prev > cur) {
-                    if (!checkRowSame(r, c, prev - 1)) {
-                        passable = false;
-                        break;
-                    }
-                }
-                prev = cur;
+            st = new StringTokenizer(br.readLine());
+            for (int c = 0; c < N; c++) {
+                map[r][c] = Integer.parseInt(st.nextToken());
             }
-
-            if (passable) result++;
         }
 
-        // 세로 길 찾기
-        installed = new boolean[N][N];
-        for (int c = 0; c < N; c++) {
-            boolean passable = true;
-            int prev = map[0][c];
-
-            for (int r = 1; r < N; r++) {
-                int cur = map[r][c];
-
-                if (prev < cur) {
-                    if (!checkColumnSame(c, r - L, cur - 1)) {
-                        passable = false;
-                        break;
-                    }
-                } else if (prev > cur) {
-                    if (!checkColumnSame(c, r, prev - 1)) {
-                        passable = false;
-                        break;
-                    }
-                }
-                prev = cur;
-            }
-
-            if (passable) result++;
+        int answer = 0;
+        
+        for (int i = 0; i < N; i++) {
+            if (isPassableRoad(extractRow(i))) answer++;
+            if (isPassableRoad(extractCol(i))) answer++;
         }
 
-        System.out.println(result);
+        System.out.println(answer);
     }
 
-    static boolean checkRowSame(int row, int start, int height) {
-        for (int i = start; i < start + L; i++) {
-            if (i < 0 || i >= N) return false;
-            if (map[row][i] != height) return false;
-            if (installed[row][i]) return false;
-            installed[row][i] = true;
+    // 특정 행 추출
+    static int[] extractRow(int r) {
+        return Arrays.copyOf(map[r], N);
+    }
+
+    // 특정 열 추출
+    static int[] extractCol(int c) {
+        int[] col = new int[N];
+        for (int r = 0; r < N; r++) {
+            col[r] = map[r][c];
+        }
+        return col;
+    }
+
+    // 지나갈 수 있는 길인지 확인
+    static boolean isPassableRoad(int[] road) {
+        boolean[] installed = new boolean[N];
+
+        for (int i = 0; i < N - 1; i++) {
+            int diff = road[i] - road[i + 1];
+
+            if (Math.abs(diff) > 1) return false;
+
+            if (diff == 1) { // 내리막
+                if (!canInstall(road, installed, i + 1, road[i + 1])) {
+                    return false;
+                }
+            } else if (diff == -1) { // 오르막
+                if (!canInstall(road, installed, i - L + 1, road[i])) {
+                    return false;
+                }
+            }
         }
         return true;
     }
 
-    static boolean checkColumnSame(int column, int start, int height) {
+    // 경사로 설치 가능 여부 확인
+    static boolean canInstall(int[] road, boolean[] installed, int start, int height) {
         for (int i = start; i < start + L; i++) {
             if (i < 0 || i >= N) return false;
-            if (map[i][column] != height) return false;
-            if (installed[i][column]) return false;
-            installed[i][column] = true;
+            if (road[i] != height || installed[i]) return false;
+            installed[i] = true;
         }
         return true;
     }
