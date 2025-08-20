@@ -54,14 +54,12 @@ public class Main {
             for (int[] pos : toMelt) {
                 map[pos[0]][pos[1]] = 0; // 치즈 녹이기
             }
-
             time++;
         }
 
         System.out.println(time);
     }
 
-    // BFS로 외부 공기 탐색
     static void bfsAir() {
         Queue<int[]> q = new LinkedList<>();
         q.add(new int[]{0, 0});
