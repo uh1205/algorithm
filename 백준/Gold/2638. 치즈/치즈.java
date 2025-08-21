@@ -23,7 +23,6 @@ public class Main {
         }
 
         int time = 0;
-
         while (true) {
             visited = new boolean[N][M];
             bfsAir(); // 외부 공기 체크
