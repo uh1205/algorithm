@@ -4,39 +4,35 @@ import java.util.*;
 public class Main {
     static int N, K;
     static int[] words;
-    static char[] necessary = {'a', 'n', 't', 'i', 'c'};
+    static final char[] necessary = {'a', 'n', 't', 'i', 'c'};
     static int maxCount = 0;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
 
-        // 필수 알파벳(a, n, t, i, c)을 배우지 못하는 경우
+        // 필수 알파벳(a, n, t, i, c)을 못 배우는 경우
         if (K < 5) {
             System.out.println(0);
             return;
         }
-
-        // 모든 글자를 다 배우는 경우
+        // 모든 알파벳을 배우는 경우
         if (K == 26) {
             System.out.println(N);
             return;
         }
 
         words = new int[N];
-
         for (int i = 0; i < N; i++) {
             String word = br.readLine();
-            words[i] = 0;
             for (char ch : word.toCharArray()) {
                 words[i] |= (1 << (ch - 'a'));
             }
         }
 
-        int selected = (1 << 26);
-
+        int selected = 0;
         for (char ch : necessary) {
             selected |= (1 << (ch - 'a'));
         }
@@ -59,5 +55,4 @@ public class Main {
             dfs(depth + 1, i + 1, selected | (1 << i));
         }
     }
-
 }
