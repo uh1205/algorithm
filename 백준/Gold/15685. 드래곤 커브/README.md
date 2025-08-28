@@ -4,7 +4,7 @@
 
 ### 성능 요약
 
-메모리: 12000 KB, 시간: 72 ms
+메모리: 11796 KB, 시간: 72 ms
 
 ### 분류
 
@@ -12,7 +12,7 @@
 
 ### 제출 일자
 
-2025년 8월 23일 23:33:05
+2025년 8월 28일 17:57:41
 
 ### 문제 설명
 
@@ -34,7 +34,7 @@
 
 <p>2세대 드래곤 커브도 1세대를 만든 방법을 이용해서 만들 수 있다. (파란색 선분은 새로 추가된 선분을 나타낸다)</p>
 
-<p style="text-align: center;"><img alt="" src="" style="width: 220px; height: 285px;"></p>
+<p style="text-align: center;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/15685/3.png" style="width: 220px; height: 285px;"></p>
 
 <p>3세대 드래곤 커브도 2세대 드래곤 커브를 이용해 만들 수 있다. 아래 그림은 3세대 드래곤 커브이다.</p>
 
