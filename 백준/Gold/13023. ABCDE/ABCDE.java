@@ -36,7 +36,7 @@ public class Main {
     }
 
     static void dfs(int depth, int node) {
-        if (found) return;
+        if (found) return; // 이미 찾은 경우 중단
 
         if (depth == 5) {
             found = true;
@@ -44,12 +44,10 @@ public class Main {
         }
 
         visited[node] = true;
-
         for (int next : graph.get(node)) {
             if (visited[next]) continue;
             dfs(depth + 1, next);
         }
-        
-        visited[node] = false;
+        visited[node] = false; // 다른 경로 탐색을 위해 백트래킹
     }
 }
