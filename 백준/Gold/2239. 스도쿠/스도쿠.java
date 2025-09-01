@@ -3,71 +3,88 @@ import java.util.*;
 
 public class Main {
     static int[][] board = new int[9][9];
-    static boolean[][] rowUsed = new boolean[9][10];
-    static boolean[][] colUsed = new boolean[9][10];
-    static boolean[][] boxUsed = new boolean[9][10];
+    static int[] rowMask = new int[9];     // 각 행에 사용된 숫자 비트(1~9 -> bit 1~9)
+    static int[] colMask = new int[9];     // 각 열에 사용된 숫자 비트
+    static int[][] boxMask = new int[3][3];// 각 3x3 박스에 사용된 숫자 비트
     static List<int[]> blanks = new ArrayList<>();
     static boolean solved = false;
+    static StringBuilder out = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        for (int i = 0; i < 9; i++) {
-            String line = br.readLine();
-            for (int j = 0; j < 9; j++) {
-                int num = line.charAt(j) - '0';
-                board[i][j] = num;
-                if (num == 0) {
-                    blanks.add(new int[]{i, j});
+        // 입력: 9줄, 공백 없이 9자리 숫자
+        for (int r = 0; r < 9; r++) {
+            String line = br.readLine().trim();
+            for (int c = 0; c < 9; c++) {
+                int v = line.charAt(c) - '0';
+                board[r][c] = v;
+                if (v == 0) {
+                    blanks.add(new int[]{r, c}); // 행→열 순서로 저장(사전식 보장)
                 } else {
-                    rowUsed[i][num] = true;
-                    colUsed[j][num] = true;
-                    boxUsed[boxIndex(i, j)][num] = true;
+                    int bit = 1 << v;
+                    rowMask[r] |= bit;
+                    colMask[c] |= bit;
+                    boxMask[r / 3][c / 3] |= bit;
                 }
             }
         }
 
         dfs(0);
-        printBoard();
+
+        // 해는 항상 존재(문제 보장). out에 결과가 채워져 있음.
+        System.out.print(out);
     }
 
-    static int boxIndex(int r, int c) {
-        return (r / 3) * 3 + (c / 3);
-    }
-
+    // idx번째 빈칸을 채운다(빈칸 순서 고정: 행 0..8, 열 0..8)
     static void dfs(int idx) {
+        if (solved) return;
         if (idx == blanks.size()) {
+            // 해 완성 → 사전식 최소(변수 순서/값 순서 보장) 첫 해 출력
+            printBoard();
             solved = true;
             return;
         }
 
         int[] pos = blanks.get(idx);
-        int r = pos[0];
-        int c = pos[1];
+        int r = pos[0], c = pos[1];
 
+        // 사용된 숫자 비트 통합
+        int used = rowMask[r] | colMask[c] | boxMask[r / 3][c / 3];
+
+        // 후보: (~used) & 0b1111111110 (bit1~bit9만 유효)
+        int candidates = (~used) & 0x3FE;
+
+        // 사전식 최소 해를 위해 값은 1→9 오름차순 시도
         for (int num = 1; num <= 9; num++) {
-            if (rowUsed[r][num] || colUsed[c][num] ||
-                    boxUsed[boxIndex(r, c)][num]) continue;
+            int bit = 1 << num;
+            if ((candidates & bit) == 0) continue;
 
-            board[r][c] = num;
-            rowUsed[r][num] = colUsed[c][num] = boxUsed[boxIndex(r, c)][num] = true;
-
+            place(r, c, num, bit);
             dfs(idx + 1);
             if (solved) return;
-
-            board[r][c] = 0;
-            rowUsed[r][num] = colUsed[c][num] = boxUsed[boxIndex(r, c)][num] = false;
+            remove(r, c, num, bit);
         }
     }
 
+    static void place(int r, int c, int num, int bit) {
+        board[r][c] = num;
+        rowMask[r] |= bit;
+        colMask[c] |= bit;
+        boxMask[r / 3][c / 3] |= bit;
+    }
+
+    static void remove(int r, int c, int num, int bit) {
+        board[r][c] = 0;
+        rowMask[r] ^= bit;
+        colMask[c] ^= bit;
+        boxMask[r / 3][c / 3] ^= bit;
+    }
+
     static void printBoard() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                sb.append(board[i][j]);
-            }
-            sb.append('\n');
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) out.append(board[r][c]);
+            out.append('\n');
         }
-        System.out.print(sb);
     }
 }
