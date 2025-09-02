@@ -9,8 +9,8 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
 
-        for (int i = 2; i < 9; i++) {
-            if (isPrime(i)) dfs(0, i);
+        for (int i : new int[]{2, 3, 5, 7}) {
+            dfs(0, i);
         }
 
         System.out.println(result);
