@@ -21,7 +21,7 @@ public class Main {
             result.append(num).append('\n');
             return;
         }
-        for (int i = 1; i <= 9; i++) {
+        for (int i : new int[]{1, 3, 5, 7, 9}) {
             if (isPrime(num * 10 + i)) {
                 num = num * 10 + i;
                 dfs(depth + 1, num);
