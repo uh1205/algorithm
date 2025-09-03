@@ -24,16 +24,11 @@ public class Main {
             int d = Integer.parseInt(st.nextToken());
             int z = Integer.parseInt(st.nextToken());
 
-            // 속도 최적화
-            if (d == 1 || d == 2) s %= (R - 1) * 2;
-            else s %= (C - 1) * 2;
-
             map[r][c] = new Shark(r, c, s, d, z);
         }
 
         int answer = 0;
 
-        // 낚시왕 이동 (1열부터 C열까지)
         for (int king = 1; king <= C; king++) {
             // 1. 현재 열에서 가장 가까운 상어 잡기
             for (int r = 1; r <= R; r++) {
@@ -58,19 +53,31 @@ public class Main {
                     Shark sh = map[i][j];
                     int r = sh.r;
                     int c = sh.c;
+                    int s = sh.s;
                     int d = sh.d;
-                    int move = sh.s;
 
-                    while (move-- > 0) {
-                        int nr = r + dr[d];
-                        int nc = c + dc[d];
-                        if (nr < 1 || nr > R || nc < 1 || nc > C) {
-                            d = (d % 2 == 0) ? d - 1 : d + 1; // 방향 반전
-                            nr = r + dr[d]; // 반전한 방향으로 재계산
-                            nc = c + dc[d];
+                    if (d == 1 || d == 2) { // 세로 이동
+                        int cycle = (R - 1) * 2;
+                        int move = (r - 1 + (d == 1 ? -s : s)) % cycle;
+                        if (move < 0) move += cycle;
+                        if (move >= R) {
+                            r = cycle - move + 1;
+                            d = (d == 1) ? 2 : 1; // 방향 반전
+                        } else {
+                            r = move + 1;
+                            d = (d == 1) ? 1 : 2;
                         }
-                        r = nr;
-                        c = nc;
+                    } else { // 가로 이동
+                        int cycle = (C - 1) * 2;
+                        int move = (c - 1 + (d == 4 ? -s : s)) % cycle;
+                        if (move < 0) move += cycle;
+                        if (move >= C) {
+                            c = cycle - move + 1;
+                            d = (d == 3) ? 4 : 3; // 방향 반전
+                        } else {
+                            c = move + 1;
+                            d = (d == 3) ? 3 : 4;
+                        }
                     }
 
                     sh.r = r;
@@ -83,7 +90,7 @@ public class Main {
                 }
             }
         }
-        map = newMap; // 이동 결과 반영
+        map = newMap;
     }
 
     static class Shark {
