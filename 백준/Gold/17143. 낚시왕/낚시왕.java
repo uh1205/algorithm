@@ -3,10 +3,20 @@ import java.util.*;
 
 public class Main {
     static int R, C, M;
-    static int[][] map;
-    static Map<Integer, Shark> sharks = new HashMap<>();
+    static Shark[][] map;
     static int[] dr = {0, -1, 1, 0, 0}; // 1:위, 2:아래, 3:오른쪽, 4:왼쪽
     static int[] dc = {0, 0, 0, 1, -1};
+
+    static class Shark {
+        int r, c, s, d, z;
+        Shark(int r, int c, int s, int d, int z) {
+            this.r = r;
+            this.c = c;
+            this.s = s;
+            this.d = d;
+            this.z = z;
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -14,86 +24,68 @@ public class Main {
         R = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-
-        map = new int[R + 1][C + 1];
+        map = new Shark[R + 1][C + 1];
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int r = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
-            int s = Integer.parseInt(st.nextToken()); // 속력
-            int d = Integer.parseInt(st.nextToken()); // 방향 (1:위, 2:아래, 3:오른쪽, 4:왼쪽)
-            int z = Integer.parseInt(st.nextToken()); // 크기
-            sharks.put(z, new Shark(r, c, s, d, z));
-            map[r][c] = z; // 상어의 위치와 크기 기록
+            int s = Integer.parseInt(st.nextToken());
+            int d = Integer.parseInt(st.nextToken());
+            int z = Integer.parseInt(st.nextToken());
+
+            // 속도 최적화
+            if (d == 1 || d == 2) s %= (R - 1) * 2;
+            else s %= (C - 1) * 2;
+
+            map[r][c] = new Shark(r, c, s, d, z);
         }
 
-        int result = 0;
+        int answer = 0;
 
-        for (int col = 1; col <= C; col++) {
-            // 1. 가장 가까운 상어 잡기
-            Shark nearest = catchNearestShark(col);
-            if (nearest != null) {
-                result += nearest.z;
+        // 낚시왕 이동 (1열부터 C열까지)
+        for (int king = 1; king <= C; king++) {
+            // 1. 현재 열에서 가장 가까운 상어 잡기
+            for (int r = 1; r <= R; r++) {
+                if (map[r][king] != null) {
+                    answer += map[r][king].z;
+                    map[r][king] = null;
+                    break;
+                }
             }
-            // 2. 상어 이동 (겹칠 경우 큰 상어가 작은 상어를 먹음)
-            moveSharks();
-        }
 
-        System.out.println(result);
-    }
+            // 2. 상어 이동
+            Shark[][] newMap = new Shark[R + 1][C + 1];
+            for (int r = 1; r <= R; r++) {
+                for (int c = 1; c <= C; c++) {
+                    if (map[r][c] != null) {
+                        Shark sh = map[r][c];
+                        int nr = sh.r;
+                        int nc = sh.c;
+                        int d = sh.d;
 
-    static Shark catchNearestShark(int col) {
-        for (int r = 1; r <= R; r++) {
-            if (map[r][col] != 0) return sharks.remove(map[r][col]);
-        }
-        return null;
-    }
+                        for (int s = 0; s < sh.s; s++) {
+                            if (nr + dr[d] <= 0 || nr + dr[d] > R ||
+                                nc + dc[d] <= 0 || nc + dc[d] > C) {
+                                d = (d % 2 == 0) ? d - 1 : d + 1; // 방향 반전
+                            }
+                            nr += dr[d];
+                            nc += dc[d];
+                        }
 
-    static void moveSharks() {
-        int[][] newMap = new int[R + 1][C + 1];
-        List<Integer> toRemove = new ArrayList<>();
+                        sh.r = nr;
+                        sh.c = nc;
+                        sh.d = d;
 
-        for (Shark shark : sharks.values()) {
-            int move = shark.s;
-            while (move-- > 0) {
-                // 1:위, 2:아래, 3:오른쪽, 4:왼쪽
-                if (shark.r == 1 && shark.d == 1) shark.d = 2;
-                else if (shark.c == 1 && shark.d == 4) shark.d = 3;
-                else if (shark.r == R && shark.d == 2) shark.d = 1;
-                else if (shark.c == C && shark.d == 3) shark.d = 4;
-                shark.r += dr[shark.d];
-                shark.c += dc[shark.d];
+                        if (newMap[nr][nc] == null || newMap[nr][nc].z < sh.z) {
+                            newMap[nr][nc] = sh;
+                        }
+                    }
+                }
             }
-            int cur = newMap[shark.r][shark.c];
-            if (cur == 0) {
-                newMap[shark.r][shark.c] = shark.z;
-                continue;
-            }
-            if (cur > shark.z) {
-//                sharks.remove(shark.z);
-                toRemove.add(shark.z);
-            } else if (cur < shark.z) {
-//                sharks.remove(cur);
-                toRemove.add(cur);
-                newMap[shark.r][shark.c] = shark.z;
-            }
+            map = newMap; // 이동 결과 반영
         }
-        for (int k : toRemove) {
-            sharks.remove(k);
-        }
-        map = newMap;
-    }
 
-    static class Shark {
-        int r, c, s, d, z;
-
-        public Shark(int r, int c, int s, int d, int z) {
-            this.r = r;
-            this.c = c;
-            this.s = s;
-            this.d = d;
-            this.z = z;
-        }
+        System.out.println(answer);
     }
 }
