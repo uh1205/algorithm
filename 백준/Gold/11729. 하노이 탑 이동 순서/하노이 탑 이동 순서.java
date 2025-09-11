@@ -11,7 +11,6 @@ public class Main {
         // 이동 횟수 = 2^n - 1
         sb.append((1 << N) - 1).append('\n');
 
-        // 재귀 호출 시작
         hanoi(N, 1, 3, 2);
 
         System.out.println(sb);
