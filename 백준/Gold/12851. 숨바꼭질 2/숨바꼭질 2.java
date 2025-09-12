@@ -12,8 +12,7 @@ public class Main {
         K = Integer.parseInt(st.nextToken()); // 목표 위치
 
         int[] answer = bfs();
-        System.out.println(answer[0]);
-        System.out.println(answer[1]);
+        System.out.println(answer[0] + "\n" + answer[1]);
     }
 
     static int[] bfs() {
