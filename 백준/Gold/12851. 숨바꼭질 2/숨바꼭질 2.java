@@ -3,63 +3,43 @@ import java.util.*;
 
 public class Main {
     static final int MAX = 100_000;
-    static int N, K;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken()); // 처음 위치
-        K = Integer.parseInt(st.nextToken()); // 목표 위치
+        int N = Integer.parseInt(st.nextToken());
+        int K = Integer.parseInt(st.nextToken());
 
-        int[] answer = bfs();
-        System.out.println(answer[0] + "\n" + answer[1]);
-    }
+        int[] dist = new int[MAX + 1]; // 최단 시간
+        int[] cnt = new int[MAX + 1]; // 방법 수
+        
+        Arrays.fill(dist, -1);
 
-    static int[] bfs() {
-        Queue<int[]> q = new ArrayDeque<>();
-        boolean[] visited = new boolean[MAX + 1];
+        // BFS 시작
+        Queue<Integer> q = new LinkedList<>();
 
-        q.add(new int[]{N, 0});
-        visited[N] = true;
-
-        int minTime = Integer.MAX_VALUE;
-        int count = 0;
+        // 처음 위치 초기화
+        q.add(N); 
+        dist[N] = 0;
+        cnt[N] = 1;
 
         while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            int x = cur[0];
-            int t = cur[1];
-            visited[x] = true;
+            int cur = q.poll();
 
-            if (t > minTime) continue;
+            for (int next : new int[]{cur - 1, cur + 1, cur * 2}) {
+                if (next < 0 || next > MAX) continue;
 
-            if (x == K) {
-                minTime = t;
-                count++;
-                continue;
-            }
-
-            int nx;
-
-            // x-1
-            nx = x - 1;
-            if (nx >= 0 && !visited[nx]) {
-                q.add(new int[]{nx, t + 1});
-            }
-
-            // x+1
-            nx = x + 1;
-            if (nx <= MAX && !visited[nx]) {
-                q.add(new int[]{nx, t + 1});
-            }
-
-            // x*2
-            nx = x * 2;
-            if (nx <= MAX && !visited[nx]) {
-                q.add(new int[]{nx, t + 1});
+                if (dist[next] == -1) { // 처음 방문
+                    dist[next] = dist[cur] + 1;
+                    cnt[next] = cnt[cur];
+                    q.add(next);
+                } else if (dist[next] == dist[cur] + 1) { // 다른 최단 경로 발견
+                    cnt[next] += cnt[cur];
+                }
             }
         }
 
-        return new int[]{minTime, count};
+        System.out.println(dist[K]);
+        System.out.println(cnt[K]);
     }
 }
