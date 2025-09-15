@@ -9,7 +9,7 @@ public class Main {
 
         map = new char[N][N];
 
-        draw(N, 0, 0, false);
+        draw(0, 0, N, false);
 
         StringBuilder sb = new StringBuilder();
         for (char[] chars : map) {
@@ -19,30 +19,34 @@ public class Main {
         System.out.println(sb);
     }
 
-    static void draw(int n, int r, int c, boolean blank) {
+    // r, c : 시작 좌표
+    // size : 현재 정사각형 크기 (한 변의 길이)
+    // blank : 공백만 채워야 하는지 여부
+    static void draw(int r, int c, int size, boolean blank) {
         if (blank) {
-            for (int i = r; i < r + n; i++) {
-                for (int j = c; j < c + n; j++) {
+            // 현재 정사각형을 공백으로 채우기
+            for (int i = r; i < r + size; i++) {
+                for (int j = c; j < c + size; j++) {
                     map[i][j] = ' ';
                 }
             }
             return;
         }
 
-        if (n == 1) {
+        if (size == 1) {
             map[r][c] = '*';
             return;
         }
 
-        int size = n / 3;
-        int count = 0;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                count++;
-                if (count == 5) {
-                    draw(size, r + i * size, c + j * size, true);
+        int newSize = size / 3; // 예: 27 -> 9
+        int cnt = 0;
+        for (int i = r; i < r + size; i += newSize) {
+            for (int j = c; j < c + size; j += newSize) {
+                cnt++;
+                if (cnt == 5) { // 가운데 블록인 경우
+                    draw(i, j, newSize, true); // 공백 그리기
                 } else {
-                    draw(size, r + i * size, c + j * size, false);
+                    draw(i, j, newSize, false);
                 }
             }
         }
