@@ -1,45 +1,40 @@
-public class Solution {
+import java.util.*;
+
+class Solution {
     public int solution(String s) {
         int len = s.length();
-        int answer = len;
+        int ans = len;
 
-        // 압축 단위 1 ~ len/2까지 시도
         for (int unit = 1; unit <= len / 2; unit++) {
+            int part = len / unit;
+
             StringBuilder sb = new StringBuilder();
 
-            String prev = s.substring(0, unit); // 첫 덩어리
+            String prev = s.substring(0, unit);
             int cnt = 1;
 
-            // 단위 길이만큼 이동하면서 비교
-            for (int i = unit; i <= len; i += unit) {
-                // 현재 덩어리 구하기 (마지막 부분이 unit보다 짧을 수 있음)
-                String cur;
-                if (i + unit <= len) {
-                    cur = s.substring(i, i + unit);
-                } else {
-                    cur = s.substring(i); // i부터 끝까지
-                }
-
-                // 이전 문자열과 같으면 카운트 증가
+            for (int i = 1; i < part; i++) {
+                String cur = s.substring(unit * i, unit * i + unit);
                 if (cur.equals(prev)) {
                     cnt++;
                 } else {
-                    // 다르면 압축 결과에 추가
                     if (cnt > 1) sb.append(cnt);
                     sb.append(prev);
-                    prev = cur; // 다음 비교 대상
+                    prev = cur;
                     cnt = 1;
                 }
             }
 
-            // 마지막 남은 부분 처리
             if (cnt > 1) sb.append(cnt);
             sb.append(prev);
 
-            // 최솟값 갱신
-            answer = Math.min(answer, sb.length());
+            if (len % unit != 0) {
+                sb.append(s.substring(part * unit));
+            }
+
+            ans = Math.min(ans, sb.length());
         }
 
-        return answer;
+        return ans;
     }
 }
