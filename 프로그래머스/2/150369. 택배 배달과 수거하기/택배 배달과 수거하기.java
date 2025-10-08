@@ -1,40 +1,30 @@
 class Solution {
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
-        long ans = 0;
-        int farthest = n - 1; // 가야할 가장 먼 집의 인덱스
-        
-        while (farthest >= 0) {
-            // 배달 및 수거할 상자가 없는 경우
-            if (deliveries[farthest] == 0 && pickups[farthest] == 0) {
-                farthest--;
-                continue;
-            }
-            
-            ans += 2 * (farthest + 1); // 왕복 거리
-            
-            // 뒤에서부터 배달
-            int d = cap;
-            for (int i = farthest; i >= 0; i--) { 
-                if (deliveries[i] >= d) {
-                    deliveries[i] -= d;
-                    break;
-                }
-                d -= deliveries[i];
-                deliveries[i] = 0;
-            }
-            
-            // 돌아오면서 수거
-            int p = cap;
-            for (int i = farthest; i >= 0; i--) { 
-                if (pickups[i] >= p) {
-                    pickups[i] -= p;
-                    break;
-                }
-                p -= pickups[i];
-                pickups[i] = 0;
+        long answer = 0;
+
+        // 처리해야 할 배달 및 수거량을 누적할 변수
+        int deliverCount = 0;
+        int pickupCount = 0;
+
+        // 가장 먼 집부터 역순으로 순회
+        for (int i = n - 1; i >= 0; i--) {
+            // 현재 집에서 처리해야 할 배달/수거량을 누적
+            deliverCount += deliveries[i];
+            pickupCount += pickups[i];
+
+            // 현재 집에 들러야 하는 경우 (처리할 배달 또는 수거가 있는 경우)
+            while (deliverCount > 0 || pickupCount > 0) {
+                // 이 집까지 왕복
+                answer += (long) (i + 1) * 2;
+
+                // 한 번의 왕복으로 cap만큼의 배달과 수거를 처리함
+                deliverCount -= cap;
+                pickupCount -= cap;
+
+                // 처리할 배달 또는 수거가 없을 때까지 반복
             }
         }
-        
-        return ans;
+
+        return answer;
     }
 }
