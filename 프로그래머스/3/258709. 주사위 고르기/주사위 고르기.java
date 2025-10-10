@@ -11,24 +11,22 @@ class Solution {
         dices = dice;
         answer = new int[n / 2];
 
-        // A가 가져갈 주사위 조합을 생성
+        // A의 주사위 조합 생성
         combination(0, new ArrayList<>());
 
         return answer;
     }
 
-    // 1. A의 주사위 조합 생성 (DFS)
     void combination(int start, List<Integer> selected) {
+        // 조합이 완성되면 승리 횟수 계산
         if (selected.size() == n / 2) {
-            // 조합이 완성되면 승리 횟수 계산
             calculateWins(selected);
             return;
         }
-
         for (int i = start; i < n; i++) {
             selected.add(i);
             combination(i + 1, selected);
-            selected.remove(selected.size() - 1);
+            selected.remove(selected.size() - 1); // 백트래킹
         }
     }
 
@@ -51,17 +49,19 @@ class Solution {
         Collections.sort(sumsB);
         int wins = 0;
         for (int sumA : sumsA) {
-            // 이분 탐색으로 sumA보다 작은 sumB의 개수를 찾음
-            int low = 0, high = sumsB.size();
-            while (low < high) {
-                int mid = (low + high) / 2;
+            // 이진 탐색으로 sumA보다 작은 sumB의 개수를 찾음
+            // 중복된 값이 존재할 수 있으므로, 직접 lowerBound 구현
+            int left = 0;
+            int right = sumsB.size();
+            while (left < right) {
+                int mid = (left + right) / 2;
                 if (sumsB.get(mid) < sumA) {
-                    low = mid + 1;
+                    left = mid + 1;
                 } else {
-                    high = mid;
+                    right = mid;
                 }
             }
-            wins += low;
+            wins += left;
         }
 
         // 최적의 조합 갱신
@@ -73,13 +73,11 @@ class Solution {
         }
     }
 
-    // 모든 점수 합계를 생성하는 재귀 함수
     void generateSums(int idx, int currentSum, List<Integer> selected, List<Integer> sums) {
         if (idx == selected.size()) {
             sums.add(currentSum);
             return;
         }
-
         for (int face : dices[selected.get(idx)]) {
             generateSums(idx + 1, currentSum + face, selected, sums);
         }
