@@ -23,7 +23,7 @@ public class Main {
             for (int i = 0; i < 12; i++) {
                 for (int j = 0; j < 6; j++) {
                     if (board[i][j] != '.' && !visited[i][j]) {
-                        bfs(i, j, visited);
+                        isPopped |= bfs(i, j, visited);
                     }
                 }
             }
@@ -39,7 +39,9 @@ public class Main {
         System.out.println(totalChain);
     }
 
-    static void bfs(int r, int c, boolean[][] visited) {
+    static boolean bfs(int r, int c, boolean[][] visited) {
+        boolean isPopped = false;
+
         Queue<int[]> q = new LinkedList<>();
         List<int[]> list = new ArrayList<>();
 
@@ -74,6 +76,8 @@ public class Main {
                 board[pos[0]][pos[1]] = '.';
             }
         }
+
+        return isPopped;
     }
 
     static void applyGravity() {
