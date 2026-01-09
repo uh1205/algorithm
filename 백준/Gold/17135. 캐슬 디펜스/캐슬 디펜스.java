@@ -6,7 +6,6 @@ public class Main {
     static int[][] board;
     static int enemyCount = 0;
     static int maxKill = 0;
-    static int[] archer = new int[3];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -27,105 +26,89 @@ public class Main {
             }
         }
 
-        dfs(0, 0);
+        deployArchers(0, 0, new int[3]);
 
         System.out.println(maxKill);
     }
 
-    static void dfs(int start, int depth) {
-        // 궁수 배치 완료한 경우
-        if (depth == 3) {
-            maxKill = Math.max(maxKill, simulate());
+    static void deployArchers(int start, int count, int[] positions) {
+        if (count == 3) {
+            maxKill = Math.max(maxKill, simulate(positions));
             return;
         }
         for (int i = start; i < M; i++) {
-            archer[depth] = i;
-            dfs(i + 1, depth + 1);
+            positions[count] = i;
+            deployArchers(i + 1, count + 1, positions);
         }
     }
 
-    static int simulate() {
+    static int simulate(int[] archers) {
         int killCount = 0;
-        int leftEnemy = enemyCount;
         int[][] board = copyBoard();
 
-        while (leftEnemy > 0) {
-            // 각 궁수가 공격할 적의 위치
-            List<int[]> attack = new ArrayList<>();
-            for (int c : archer) {
-                chooseToAttack(board, c).ifPresent(attack::add);
-            }
+        for (int turn = 0; turn < N; turn++) {
+            List<int[]> targets = getTargets(archers, board);
 
-            // 공격
-            for (int[] a : attack) {
-                int r = a[0];
-                int c = a[1];
+            for (int[] target : targets) {
+                int r = target[0];
+                int c = target[1];
                 if (board[r][c] == 1) {
                     board[r][c] = 0;
                     killCount++;
-                    leftEnemy--;
                 }
             }
 
-            // 적 이동
-            for (int val : board[N - 1]) {
-                if (val == 1) {
-                    leftEnemy--;
-                }
-            }
-            move(board);
+            moveEnemies(board);
         }
 
         return killCount;
     }
 
-    static int[][] copyBoard() {
-        int[][] copied = new int[N][M];
-        for (int i = 0; i < N; i++) {
-            copied[i] = Arrays.copyOf(board[i], M);
-        }
-        return copied;
-    }
+    static List<int[]> getTargets(int[] archers, int[][] board) {
+        List<int[]> targets = new ArrayList<>();
 
-    static Optional<int[]> chooseToAttack(int[][] board, int archerCol) {
-        // 가장 가까운 적 찾기
-        List<int[]> nearest = new ArrayList<>();
-        int minD = D + 1;
-        for (int i = N - 1; i >= 0; i--) {
-            for (int j = 0; j < M; j++) {
-                if (board[i][j] == 0) {
-                    continue;
-                }
-                int distance = Math.abs(N - i) + Math.abs(archerCol - j);
-                if (distance > D) {
-                    continue;
-                }
-                if (distance == minD) {
-                    nearest.add(new int[]{i, j});
-                }
-                if (distance < minD) {
-                    minD = distance;
-                    nearest.clear();
-                    nearest.add(new int[]{i, j});
+        // 각 궁수마다 공격할 적 찾기
+        for (int archerCol : archers) {
+            int targetR = -1;
+            int targetC = -1;
+            int minDist = D + 1;
+
+            // 거리 가까운 순, 같다면 c가 작은 순 (왼쪽)
+            for (int c = 0; c < M; c++) {
+                for (int r = N - 1; r >= 0; r--) {
+                    if (board[r][c] == 0) {
+                        continue;
+                    }
+                    int dist = Math.abs(N - r) + Math.abs(archerCol - c);
+                    if (dist <= D && dist < minDist) {
+                        minDist = dist;
+                        targetR = r;
+                        targetC = c;
+                    }
                 }
             }
-        }
 
-        // 가장 가까운 적이 여러 명일 경우 가장 왼쪽에 있는 적 선택
-        if (nearest.size() > 1) {
-            nearest.sort(Comparator.comparingInt(a -> a[1]));
+            if (targetR != -1) {
+                targets.add(new int[]{targetR, targetC});
+            }
         }
-
-        if (nearest.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(nearest.get(0));
+        
+        return targets;
     }
 
-    static void move(int[][] board) {
+    static void moveEnemies(int[][] board) {
         for (int i = N - 1; i > 0; i--) {
             board[i] = board[i - 1];
         }
         board[0] = new int[M];
+    }
+
+    static int[][] copyBoard() {
+        int[][] temp = new int[N][M];
+        for (int i = 0; i < N; i++) {
+//            temp[i] = Arrays.copyOf(board[i], M);
+            temp[i] = board[i].clone();
+        }
+        return temp;
     }
 }
