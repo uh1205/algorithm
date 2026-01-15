@@ -1,29 +1,5 @@
-import java.util.*;
 import java.io.*;
-
-class Node implements Comparable<Node> {
-    int target;
-    double weight;
-
-    Node(int target, double weight) {
-        this.target = target;
-        this.weight = weight;
-    }
-
-    @Override
-    public int compareTo(Node o) {
-        return Double.compare(this.weight, o.weight);
-    }
-}
-
-class Star {
-    double x, y;
-
-    Star(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -33,51 +9,77 @@ public class Main {
         Star[] stars = new Star[n];
         for (int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            stars[i] = new Star(Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()));
+            double x = Double.parseDouble(st.nextToken());
+            double y = Double.parseDouble(st.nextToken());
+            stars[i] = new Star(x, y);
         }
 
-        // 인접 리스트 생성 (모든 별이 서로 연결된 완전 그래프)
-        List<List<Node>> adj = new ArrayList<>();
+        List<List<Edge>> graph = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            adj.add(new ArrayList<>());
+            graph.add(new ArrayList<>());
         }
 
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 double dist = Math.sqrt(Math.pow(stars[i].x - stars[j].x, 2) + Math.pow(stars[i].y - stars[j].y, 2));
-                adj.get(i).add(new Node(j, dist));
-                adj.get(j).add(new Node(i, dist));
+                graph.get(i).add(new Edge(j, dist));
+                graph.get(j).add(new Edge(i, dist));
             }
         }
 
-        // 프림 알고리즘
         boolean[] visited = new boolean[n];
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        pq.add(new Node(0, 0)); // 0번 별부터 시작
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        pq.add(new Edge(0, 0));
 
-        double ans = 0;
+        double sum = 0;
         int count = 0;
 
         while (!pq.isEmpty()) {
-            Node curr = pq.poll();
+            Edge cur = pq.poll();
+            int node = cur.node;
 
-            if (visited[curr.target]) {
+            if (visited[node]) {
                 continue;
             }
 
-            visited[curr.target] = true;
-            ans += curr.weight;
+            visited[node] = true;
+            sum += cur.dist;
+            
             if (++count == n) {
                 break;
             }
 
-            for (Node next : adj.get(curr.target)) {
-                if (!visited[next.target]) {
+            for (Edge next : graph.get(node)) {
+                if (!visited[next.node]) {
                     pq.add(next);
                 }
             }
         }
 
-        System.out.printf("%.2f\n", ans);
+        System.out.printf("%.2f", sum);
+    }
+
+    static class Star {
+        double x, y;
+
+        public Star(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static class Edge implements Comparable<Edge> {
+        int node;
+        double dist;
+
+        public Edge(int node, double dist) {
+            this.node = node;
+            this.dist = dist;
+        }
+
+        @Override
+        public int compareTo(Edge o) {
+            return Double.compare(this.dist, o.dist);
+        }
     }
 }
