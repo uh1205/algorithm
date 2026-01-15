@@ -4,7 +4,6 @@ import java.util.*;
 public class Main {
     static int N, M, islandCount = 0;
     static int[][] map;
-    static int[][] adj;
     static int[] dr = {-1, 1, 0, 0};
     static int[] dc = {0, 0, -1, 1};
 
@@ -14,6 +13,7 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
+        // 지도 입력
         map = new int[N][M];
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
@@ -22,123 +22,156 @@ public class Main {
             }
         }
 
-        // 1. 섬 식별 (BFS)
-        boolean[][] visited = new boolean[N][M];
+        // 섬 번호 붙임
+        markIslands();
+
+        // 각 섬을 잇는 다리의 최소 길이(최소 2 이상) 구하기
+        int[][] distance = new int[islandCount + 1][islandCount + 1];
+        for (int[] d : distance) {
+            Arrays.fill(d, Integer.MAX_VALUE);
+        }
+
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < M; j++) {
-                if (map[i][j] == 1 && !visited[i][j]) {
-                    labelIsland(i, j, ++islandCount, visited);
+                if (map[i][j] != 0) {
+                    buildBridge(i, j, map[i][j], distance);
                 }
             }
         }
 
-        // 2. 인접 행렬 초기화 (무한대 값으로)
-        adj = new int[islandCount + 1][islandCount + 1];
-        for (int i = 1; i <= islandCount; i++) {
-            Arrays.fill(adj[i], Integer.MAX_VALUE);
+        List<List<Edge>> graph = new ArrayList<>();
+        for (int i = 0; i < islandCount + 1; i++) {
+            graph.add(new ArrayList<>());
         }
 
-        // 3. 모든 다리 건설 시도 및 최소 거리 갱신
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] > 0) {
-                    makeBridges(i, j, map[i][j]);
+        for (int i = 0; i < distance.length; i++) {
+            for (int j = 0; j < distance.length; j++) {
+                if (distance[i][j] != Integer.MAX_VALUE) {
+                    graph.get(i).add(new Edge(j, distance[i][j]));
                 }
             }
         }
 
-        // 4. 프림 알고리즘 수행
-        System.out.println(prim());
-    }
+        // MST
+        boolean[] visited = new boolean[islandCount + 1];
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        pq.add(new Edge(1, 0));
 
-    static void labelIsland(int r, int c, int id, boolean[][] visited) {
-        Queue<int[]> q = new LinkedList<>();
-        q.add(new int[]{r, c});
-        visited[r][c] = true;
-        map[r][c] = id;
-
-        while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            for (int d = 0; d < 4; d++) {
-                int nr = cur[0] + dr[d];
-                int nc = cur[1] + dc[d];
-                if (nr >= 0 && nc >= 0 && nr < N && nc < M &&
-                        map[nr][nc] == 1 && !visited[nr][nc]) {
-                    visited[nr][nc] = true;
-                    map[nr][nc] = id;
-                    q.add(new int[]{nr, nc});
-                }
-            }
-        }
-    }
-
-    static void makeBridges(int r, int c, int startIsland) {
-        for (int d = 0; d < 4; d++) {
-            int nr = r + dr[d];
-            int nc = c + dc[d];
-            int dist = 0;
-
-            while (nr >= 0 && nc >= 0 && nr < N && nc < M) {
-                if (map[nr][nc] == startIsland) {
-                    break; // 같은 섬
-                }
-                if (map[nr][nc] > 0) { // 다른 섬 도달
-                    if (dist >= 2) {
-                        int endIsland = map[nr][nc];
-                        adj[startIsland][endIsland] = Math.min(adj[startIsland][endIsland], dist);
-                        adj[endIsland][startIsland] = Math.min(adj[endIsland][startIsland], dist);
-                    }
-                    break;
-                }
-                // 바다일 경우 계속 전진
-                dist++;
-                nr += dr[d];
-                nc += dc[d];
-            }
-        }
-    }
-
-    static int prim() {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        boolean[] inMST = new boolean[islandCount + 1];
-        pq.add(new Node(1, 0)); // 1번 섬부터 시작
-
-        int totalWeight = 0;
+        int sum = 0;
         int count = 0;
 
         while (!pq.isEmpty()) {
-            Node curr = pq.poll();
+            Edge cur = pq.poll();
+            int node = cur.node;
 
-            if (inMST[curr.to]) {
+            if (visited[node]) {
                 continue;
             }
 
-            inMST[curr.to] = true;
-            totalWeight += curr.weight;
-            count++;
+            visited[node] = true;
+            sum += cur.dist;
 
-            for (int next = 1; next <= islandCount; next++) {
-                if (!inMST[next] && adj[curr.to][next] != Integer.MAX_VALUE) {
-                    pq.add(new Node(next, adj[curr.to][next]));
+            if (++count == islandCount) {
+                break;
+            }
+
+            for (Edge e : graph.get(node)) {
+                if (!visited[e.node]) {
+                    pq.add(e);
                 }
             }
         }
 
-        // 모든 섬이 연결되었는지 확인
-        return count == islandCount ? totalWeight : -1;
+        if (count != islandCount) {
+            System.out.println(-1);
+            return;
+        }
+
+        System.out.println(sum);
     }
 
-    static class Node implements Comparable<Node> {
-        int to, weight;
+    static void markIslands() {
+        boolean[][] visited = new boolean[N][M];
 
-        Node(int to, int weight) {
-            this.to = to;
-            this.weight = weight;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] != 0 && !visited[i][j]) {
+                    bfs(i, j, ++islandCount, visited);
+                }
+            }
+        }
+    }
+
+    static void bfs(int i, int j, int num, boolean[][] visited) {
+        Queue<int[]> q = new LinkedList<>();
+        q.add(new int[]{i, j});
+        visited[i][j] = true;
+        map[i][j] = num;
+
+        while (!q.isEmpty()) {
+            int[] cur = q.poll();
+            int cr = cur[0];
+            int cc = cur[1];
+
+            for (int d = 0; d < 4; d++) {
+                int nr = cr + dr[d];
+                int nc = cc + dc[d];
+
+                if (nr < 0 || nc < 0 || nr >= N || nc >= M ||
+                        visited[nr][nc] || map[nr][nc] == 0) {
+                    continue;
+                }
+
+                q.add(new int[]{nr, nc});
+                visited[nr][nc] = true;
+                map[nr][nc] = num;
+            }
+        }
+    }
+
+    // 시작 섬에서 다른 섬으로 길이가 최소 2 이상인 다리 짓기
+    static void buildBridge(int i, int j, int start, int[][] distance) {
+        for (int d = 0; d < 4; d++) {
+            int r = i;
+            int c = j;
+            int dist = 0;
+
+            while (true) {
+                r += dr[d];
+                c += dc[d];
+
+                if (r < 0 || c < 0 || r >= N || c >= M) {
+                    break;
+                }
+                if (map[r][c] == start) { // 시작 섬
+                    break;
+                }
+                if (map[r][c] != 0) { // 다른 섬 도착
+                    if (dist >= 2) {
+                        distance[start][map[r][c]] = Math.min(
+                                distance[start][map[r][c]],
+                                dist
+                        );
+                    }
+                    break;
+                }
+                dist++;
+            }
+        }
+    }
+
+    static class Edge implements Comparable<Edge> {
+        int node;
+        int dist;
+
+        public Edge(int node, int dist) {
+            this.node = node;
+            this.dist = dist;
         }
 
         @Override
-        public int compareTo(Node o) {
-            return this.weight - o.weight;
+        public int compareTo(Edge o) {
+            return Integer.compare(this.dist, o.dist);
         }
     }
 }
