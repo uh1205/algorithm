@@ -1,20 +1,17 @@
-import java.util.HashMap;
+import java.util.*;
 
 class Solution {
     public boolean solution(String[] phone_book) {
-        HashMap<String, Integer> map = new HashMap<>();
+        // 1. 전화번호부를 사전순으로 정렬
+        Arrays.sort(phone_book);
 
-        // 모든 전화번호를 해시맵에 저장
-        for (String phone : phone_book) map.put(phone, 1);
-
-        // 각 번호마다 자기 자신의 접두어가 맵에 있는지 확인
-        for (String phone : phone_book) {
-            for (int j = 1; j < phone.length(); j++) {
-                if (map.containsKey(phone.substring(0, j))) {
-                    return false;
-                }
+        // 2. 인접한 두 번호만 비교 (현재 번호가 다음 번호의 접두어인지 확인)
+        for (int i = 0; i < phone_book.length - 1; i++) {
+            if (phone_book[i + 1].startsWith(phone_book[i])) {
+                return false;
             }
         }
+
         return true;
     }
 }
