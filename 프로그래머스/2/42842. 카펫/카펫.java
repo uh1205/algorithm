@@ -2,7 +2,7 @@ class Solution {
     public int[] solution(int brown, int yellow) {
         int total = brown + yellow; // w * h
         
-        for (int h = 3; h <= 2_000_000; h++) {
+        for (int h = 3; h <= Math.sqrt(total); h++) {
             if (total % h != 0) continue;
             
             int w = total / h;
