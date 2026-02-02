@@ -3,75 +3,67 @@ import java.util.*;
 
 public class Main {
     static int N, M, R;
-    static int[] dr = {1, 0, -1, 0};
-    static int[] dc = {0, 1, 0, -1};
+    static int[][] map;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         R = Integer.parseInt(st.nextToken());
 
-        int[][] arr = new int[N][M];
-
+        map = new int[N][M];
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < M; j++) {
-                arr[i][j] = Integer.parseInt(st.nextToken());
+                map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
+        // R번 회전 수행
         for (int i = 0; i < R; i++) {
-            arr = rotate(arr);
+            rotate();
         }
 
+        // 결과 출력 (StringBuilder 권장)
         StringBuilder sb = new StringBuilder();
-        for (int[] row : arr) {
-            for (int i : row) {
-                sb.append(i).append(" ");
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                sb.append(map[i][j]).append(" ");
             }
             sb.append("\n");
         }
-
-        System.out.println(sb);
+        System.out.print(sb);
     }
 
-    static int[][] rotate(int[][] arr) {
-        int[][] after = new int[N][M];
+    static void rotate() {
+        int layers = Math.min(N, M) / 2;
 
-        int startR = 0;
-        int startC = 0;
-        int endR = N - 1;
-        int endC = M - 1;
+        for (int i = 0; i < layers; i++) {
+            int temp = map[i][i]; // 시작점 저장 (왼쪽 위)
 
-        int r = startR;
-        int c = startC;
-        int dir = 0;
-
-        while (startR < endR && startC < endC) {
-            int nr = r + dr[dir];
-            int nc = c + dc[dir];
-
-            if (nr < startR || nc < startC || nr > endR || nc > endC) {
-                dir = (dir + 1) % 4;
-                continue;
+            // 1. 위쪽 변 (왼쪽으로 이동)
+            for (int j = i; j < M - 1 - i; j++) {
+                map[i][j] = map[i][j + 1];
             }
 
-            after[nr][nc] = arr[r][c];
-            r = nr;
-            c = nc;
-
-            if (r == startR && c == startC) {
-                startR += 1;
-                startC += 1;
-                endR -= 1;
-                endC -= 1;
-                r = startR;
-                c = startC;
+            // 2. 오른쪽 변 (위쪽으로 이동)
+            for (int j = i; j < N - 1 - i; j++) {
+                map[j][M - 1 - i] = map[j + 1][M - 1 - i];
             }
+
+            // 3. 아래쪽 변 (오른쪽으로 이동)
+            for (int j = M - 1 - i; j > i; j--) {
+                map[N - 1 - i][j] = map[N - 1 - i][j - 1];
+            }
+
+            // 4. 왼쪽 변 (아래쪽으로 이동)
+            for (int j = N - 1 - i; j > i + 1; j--) {
+                map[j][i] = map[j - 1][i];
+            }
+
+            map[i + 1][i] = temp; // 저장해둔 값 배치
         }
-
-        return after;
     }
 }
