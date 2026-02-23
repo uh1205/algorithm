@@ -2,18 +2,18 @@ SELECT
     CATEGORY,
     PRICE AS MAX_PRICE,
     PRODUCT_NAME
-FROM
-    FOOD_PRODUCT A
+FROM (
+    SELECT
+        PRODUCT_NAME,
+        CATEGORY,
+        PRICE,
+        RANK() OVER(PARTITION BY CATEGORY ORDER BY PRICE DESC) AS RK
+    FROM
+        FOOD_PRODUCT
+    WHERE
+        CATEGORY IN ('과자', '국', '김치', '식용유')
+) AS A
 WHERE
-    PRICE = (
-        SELECT MAX(PRICE)
-        FROM FOOD_PRODUCT B
-        WHERE A.CATEGORY = B.CATEGORY
-        GROUP BY CATEGORY
-    )
-GROUP BY
-    CATEGORY
-HAVING
-    CATEGORY IN ('과자', '국', '김치', '식용유')
+    RK = 1
 ORDER BY
     MAX_PRICE DESC
