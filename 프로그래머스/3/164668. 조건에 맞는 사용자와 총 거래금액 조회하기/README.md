@@ -16,7 +16,7 @@ Empty
 
 ### 제출 일자
 
-2024년 06월 03일 11:59:46
+2026년 02월 24일 16:06:17
 
 ### 문제 설명
 
@@ -84,7 +84,7 @@ Empty
 <td>FALSE</td>
 </tr>
 <tr>
-<td>NICKANME</td>
+<td>NICKNAME</td>
 <td>VARCHAR(100)</td>
 <td>FALSE</td>
 </tr>
