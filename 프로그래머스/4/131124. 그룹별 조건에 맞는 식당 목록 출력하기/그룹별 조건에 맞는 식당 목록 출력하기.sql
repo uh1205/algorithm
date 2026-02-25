@@ -10,9 +10,7 @@ WHERE
     M.MEMBER_ID IN (
         SELECT MEMBER_ID
         FROM (
-            SELECT
-                RANK() OVER (ORDER BY COUNT(*) DESC) AS RK,
-                MEMBER_ID
+            SELECT MEMBER_ID, RANK() OVER (ORDER BY COUNT(*) DESC) AS RK
             FROM REST_REVIEW
             GROUP BY MEMBER_ID
         ) A
