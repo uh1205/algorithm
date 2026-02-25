@@ -1,32 +1,26 @@
-SELECT
-    G.GRADE,
-    D.ID,
-    D.EMAIL
-FROM
-    DEVELOPERS D
-JOIN (
+WITH FE AS (
+    SELECT SUM(CODE) AS FE_CODE
+    FROM SKILLCODES
+    WHERE CATEGORY = 'Front End'
+),
+DEV_GRADE AS (
     SELECT
         CASE
-            WHEN SKILL_CODE & (
-                SELECT CODE FROM SKILLCODES WHERE NAME = 'Python'
-            ) = (SELECT CODE FROM SKILLCODES WHERE NAME = 'Python')
-            AND SKILL_CODE & (
-                SELECT BIT_OR(CODE) FROM SKILLCODES WHERE CATEGORY = 'Front End'
-            ) > 0 THEN 'A'
-
-            WHEN SKILL_CODE & (
-                SELECT CODE FROM SKILLCODES WHERE NAME = 'C#'
-            ) = (SELECT CODE FROM SKILLCODES WHERE NAME = 'C#') THEN 'B'
-
-            WHEN SKILL_CODE & (
-                SELECT BIT_OR(CODE) FROM SKILLCODES WHERE CATEGORY = 'Front End'
-            ) > 0 THEN 'C'
+            WHEN (SKILL_CODE & (SELECT FE_CODE FROM FE))
+                AND (SKILL_CODE & (SELECT CODE FROM SKILLCODES WHERE NAME = 'Python'))
+                THEN 'A'
+            WHEN (SKILL_CODE & (SELECT CODE FROM SKILLCODES WHERE NAME = 'C#'))
+                THEN 'B'
+            WHEN (SKILL_CODE & (SELECT FE_CODE FROM FE))
+                THEN 'C'
         END AS GRADE,
-        ID
+        ID,
+        EMAIL
     FROM
         DEVELOPERS
-) G ON D.ID = G.ID
-WHERE
-    G.GRADE IS NOT NULL
-ORDER BY
-    G.GRADE, D.ID
+)
+
+SELECT GRADE, ID, EMAIL
+FROM DEV_GRADE
+WHERE GRADE IS NOT NULL
+ORDER BY GRADE, ID
