@@ -1,24 +1,22 @@
-SELECT 
+SELECT
     H.HISTORY_ID,
-    -- 3. 최종 금액 계산: 대여일수 * 일일 요금 * (1 - 할인율/100)
-    ROUND(C.DAILY_FEE * (DATEDIFF(H.END_DATE, H.START_DATE) + 1) * (1 - IFNULL(P.DISCOUNT_RATE, 0) / 100)) AS FEE
-FROM 
+    ROUND(C.DAILY_FEE * (DATEDIFF(END_DATE, START_DATE) + 1) * (1 - IFNULL(P.DISCOUNT_RATE, 0) / 100)) AS FEE
+FROM
     CAR_RENTAL_COMPANY_RENTAL_HISTORY H
-JOIN 
+JOIN
     CAR_RENTAL_COMPANY_CAR C ON H.CAR_ID = C.CAR_ID
-LEFT JOIN 
+    AND C.CAR_TYPE = '트럭'
+LEFT JOIN
     CAR_RENTAL_COMPANY_DISCOUNT_PLAN P ON C.CAR_TYPE = P.CAR_TYPE
     AND P.DURATION_TYPE = (
-        -- 2. 대여 기간에 맞는 DURATION_TYPE 매칭
-        CASE 
-            WHEN DATEDIFF(H.END_DATE, H.START_DATE) + 1 >= 90 THEN '90일 이상'
-            WHEN DATEDIFF(H.END_DATE, H.START_DATE) + 1 >= 30 THEN '30일 이상'
-            WHEN DATEDIFF(H.END_DATE, H.START_DATE) + 1 >= 7 THEN '7일 이상'
-            ELSE NULL
+        CASE
+            WHEN DATEDIFF(END_DATE, START_DATE) + 1 >= 90
+                THEN '90일 이상'
+            WHEN DATEDIFF(END_DATE, START_DATE) + 1 >= 30
+                THEN '30일 이상'
+            WHEN DATEDIFF(END_DATE, START_DATE) + 1 >= 7
+                THEN '7일 이상'
         END
     )
-WHERE 
-    C.CAR_TYPE = '트럭'
-ORDER BY 
-    FEE DESC, 
-    H.HISTORY_ID DESC;
+ORDER BY
+    FEE DESC, H.HISTORY_ID DESC
