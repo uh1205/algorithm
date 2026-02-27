@@ -5,8 +5,8 @@ class Solution {
         int n = maps.length;
         int m = maps[0].length;
         
-        int[] dr = {0, 0, -1, 1};
-        int[] dc = {-1, 1, 0, 0};
+        int[] dr = {-1, 1, 0, 0};
+        int[] dc = {0, 0, -1, 1};
         
         Queue<int[]> q = new ArrayDeque<>();
         boolean[][] visited = new boolean[n][m];
@@ -15,7 +15,6 @@ class Solution {
         visited[0][0] = true;
         
         int dist = 0;
-        boolean arrived = false;
         
         while (!q.isEmpty()) {
             dist++;
@@ -27,8 +26,7 @@ class Solution {
                 int cc = cur[1];
 
                 if (cr == n - 1 && cc == m - 1) {
-                    arrived = true;
-                    break;
+                    return dist;
                 }
 
                 for (int d = 0; d < 4; d++) {
@@ -45,12 +43,8 @@ class Solution {
                     q.offer(new int[]{nr, nc});
                 }
             }
-            
-            if (arrived) {
-                break;
-            }
         }
         
-        return arrived ? dist : -1;
+        return -1;
     }
 }
