@@ -1,19 +1,22 @@
+import java.util.*;
+
 class Solution {
     boolean solution(String s) {
-        int count = 0;
+        Deque<Character> stack = new ArrayDeque<>();
 
         for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '(') {
-                count++;
-            } else {
-                count--;
-            }
+            char ch = s.charAt(i);
             
-            if (count < 0) {
-                return false;
+            if (ch == '(') {
+                stack.push(ch);
+            } else {
+                if (stack.isEmpty()) {
+                    return false;
+                }
+                stack.pop();
             }
         }
-
-        return count == 0;
+        
+        return stack.isEmpty();
     }
 }
