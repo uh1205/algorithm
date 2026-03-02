@@ -23,9 +23,7 @@ class Solution {
             } else {
                 ans.add(count);
                 count = 0;
-                while (day < left[i]) {
-                    day++;
-                }
+                day = left[i];
             }
         }
         ans.add(count);
