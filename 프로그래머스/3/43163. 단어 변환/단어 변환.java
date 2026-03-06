@@ -1,32 +1,38 @@
+import java.util.*;
+
 class Solution {
-    static int ans = 100;
-    
     public int solution(String begin, String target, String[] words) {
-        boolean[] visited = new boolean[words.length];
+        int n = words.length;
         
-        for (int i = 0; i < words.length; i++) {
-            if (!visited[i] && canSwitch(begin, words[i])) {
-                dfs(i, words[i], target, words, visited, 1);
+        Queue<String> q = new ArrayDeque<>();
+        boolean[] visited = new boolean[n];
+        
+        q.offer(begin);
+        
+        int count = 0;
+        
+        while (!q.isEmpty()) {
+            count++;
+            int size = q.size();
+            while (size-- > 0) {
+                String cur = q.poll();
+
+                for (int i = 0; i < n; i++) {
+                    if (!visited[i] && canTransform(cur, words[i])) {
+                        if (words[i].equals(target)) {
+                            return count;
+                        }
+                        visited[i] = true;
+                        q.offer(words[i]);
+                    }
+                }
             }
         }
         
-        return ans == 100 ? 0 : ans;
+        return 0;
     }
     
-    void dfs(int idx, String cur, String target, String[] words, boolean[] visited, int count) {
-        if (cur.equals(target)) {
-            ans = Math.min(ans, count);
-        }
-        visited[idx] = true;
-        for (int i = 0; i < words.length; i++) {
-            if (!visited[i] && canSwitch(cur, words[i])) {
-                dfs(i, words[i], target, words, visited, count + 1);
-                visited[i] = false;
-            }
-        }
-    }
-    
-    boolean canSwitch(String from, String to) {
+    boolean canTransform(String from, String to) {
         int diff = 0;
         for (int i = 0; i < from.length(); i++) {
             if (from.charAt(i) != to.charAt(i)) {
