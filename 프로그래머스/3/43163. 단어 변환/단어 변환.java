@@ -12,30 +12,23 @@ class Solution {
         if (!hasTarget) return 0;
         
         boolean[] visited = new boolean[words.length];
-        Queue<String> q = new ArrayDeque<>();
-        q.offer(begin);
+        Queue<Node> q = new ArrayDeque<>();
         
-        int count = 0;
+        q.offer(new Node(begin, 0));
         
         while (!q.isEmpty()) {
-            int size = q.size();
-            
-            while (size-- > 0) {
-                String cur = q.poll();
-                
-                if (cur.equals(target)) {
-                    return count;
-                }
+            Node cur = q.poll();
 
-                for (int i = 0; i < words.length; i++) {
-                    if (!visited[i] && canConvert(cur, words[i])) {
-                        visited[i] = true;
-                        q.offer(words[i]);
-                    }
+            if (cur.word.equals(target)) {
+                return cur.count;
+            }
+
+            for (int i = 0; i < words.length; i++) {
+                if (!visited[i] && canConvert(cur.word, words[i])) {
+                    visited[i] = true;
+                    q.offer(new Node(words[i], cur.count + 1));
                 }
             }
-            
-            count++;
         }
         
         return 0;
@@ -50,5 +43,15 @@ class Solution {
             if (diff > 1) return false;
         }
         return diff == 1;
+    }
+    
+    static class Node {
+        String word;
+        int count;
+        
+        Node(String word, int count) {
+            this.word = word;
+            this.count = count;
+        }
     }
 }
