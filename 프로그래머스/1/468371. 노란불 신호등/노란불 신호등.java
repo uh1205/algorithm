@@ -1,29 +1,48 @@
 class Solution {
     public int solution(int[][] signals) {
         int n = signals.length;
-        int MAX = 3_200_000;
         
-        int[] yellow = new int[MAX];
+        long lcm = 1;
         for (int i = 0; i < n; i++) {
-            int cycle = signals[i][0] + signals[i][1] + signals[i][2];
-            int start = signals[i][0] + 1;
-            int end = start + signals[i][1] - 1;
-            while (end < MAX) {
-                for (int j = start; j <= end; j++) {
-                    yellow[j]++;
-                }
-                start += cycle;
-                end += cycle;
-            }
+            int g = signals[i][0];
+            int y = signals[i][1];
+            int r = signals[i][2];
+            int cycle = g + y + r;
+            lcm = getLcm(lcm, (long) cycle);
         }
         
-        int ans = -1;
-        for (int i = 0; i < MAX; i++) {
-            if (yellow[i] == n) {
-                ans = i;
-                break;
+        for (int t = 1; t <= lcm; t++) {
+            boolean allY = true;
+            
+            for (int i = 0; i < n; i++) {
+                int g = signals[i][0];
+                int y = signals[i][1];
+                int r = signals[i][2];
+                int cycle = g + y + r;
+                int time = t % cycle;
+                
+                if (time <= g || time > g + y) {
+                    allY = false;
+                    break;
+                }
             }
+            
+            if (allY) return t;
         }
-        return ans;
+        
+        return -1;
+    }
+    
+    long getLcm(long a, long b) {
+        return (a * b) / getGcd(a, b);
+    }
+    
+    long getGcd(long a, long b) {
+        while (b != 0) {
+            long tmp = a % b;
+            a = b;
+            b = tmp;
+        }
+        return a;
     }
 }
