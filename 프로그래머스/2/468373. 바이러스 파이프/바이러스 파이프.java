@@ -1,24 +1,22 @@
 import java.util.*;
 
 class Solution {
-    int N, F, K, ans = 0;
+    int n, start, k, ans = 0;
     List<List<Edge>> graph = new ArrayList<>();
     
     public int solution(int n, int infection, int[][] edges, int k) {
-        N = n;
-        F = infection;
-        K = k;
+        this.n = n;
+        start = infection;
+        this.k = k;
         
         for (int i = 0; i <= n; i++) {
             graph.add(new ArrayList<>());
         }
         
-        for (int[] edge : edges) {
-            int x = edge[0];
-            int y = edge[1];
-            int type = edge[2];
-            graph.get(x).add(new Edge(y, type));
-            graph.get(y).add(new Edge(x, type));
+        for (int[] e : edges) {
+            int x = e[0], y = e[1], t = e[2];
+            graph.get(x).add(new Edge(y, t));
+            graph.get(y).add(new Edge(x, t));
         }
         
         dfs(new int[k], 0, 0);
@@ -27,35 +25,27 @@ class Solution {
     }
     
     void dfs(int[] pipes, int cur, int depth) {
-        if (depth == K) {
+        if (depth == k) {
             bfs(pipes);
             return;
         }
-        
-        if (cur != 1) {
-            pipes[depth] = 1;
-            dfs(pipes, 1, depth + 1);
-        }
-        if (cur != 2) {
-            pipes[depth] = 2;
-            dfs(pipes, 2, depth + 1);
-        }
-        if (cur != 3) {
-            pipes[depth] = 3;
-            dfs(pipes, 3, depth + 1);
+        for (int i = 1; i <= 3; i++) {
+            if (cur != i) {
+                pipes[depth] = i;
+                dfs(pipes, i, depth + 1);
+            }
         }
     }
     
     void bfs(int[] pipes) {
         Queue<Integer> q = new ArrayDeque<>();
-        boolean[] infected = new boolean[N + 1];
-        
-        infected[F] = true;
+        boolean[] infected = new boolean[n + 1];
+        infected[start] = true;
         
         int count = 1;
         
         for (int pipe : pipes) {
-            for (int i = 1; i <= N; i++) {
+            for (int i = 1; i <= n; i++) {
                 if (infected[i]) q.offer(i);
             }
             
@@ -63,7 +53,7 @@ class Solution {
                 int cur = q.poll();
                 
                 for (Edge e : graph.get(cur)) {
-                    if (pipe == e.type && !infected[e.to]) {
+                    if (e.type == pipe && !infected[e.to]) {
                         q.offer(e.to);
                         infected[e.to] = true;
                         count++;
