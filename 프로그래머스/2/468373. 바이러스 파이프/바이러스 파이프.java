@@ -1,12 +1,11 @@
 import java.util.*;
 
 class Solution {
-    int n, start, k, ans = 0;
+    int n, k, ans = 0;
     List<List<Edge>> graph = new ArrayList<>();
     
     public int solution(int n, int infection, int[][] edges, int k) {
         this.n = n;
-        start = infection;
         this.k = k;
         
         for (int i = 0; i <= n; i++) {
@@ -19,50 +18,49 @@ class Solution {
             graph.get(y).add(new Edge(x, t));
         }
         
-        dfs(new int[k], 0, 0);
+        Set<Integer> infected = new HashSet<>();
+        infected.add(infection);
+        
+        dfs(0, 0, infected);
         
         return ans;
     }
     
-    void dfs(int[] pipes, int cur, int depth) {
+    void dfs(int depth, int cur, Set<Integer> infected) {
+        ans = Math.max(ans, infected.size());
+        
         if (depth == k) {
-            bfs(pipes);
             return;
         }
+        
         for (int i = 1; i <= 3; i++) {
             if (cur != i) {
-                pipes[depth] = i;
-                dfs(pipes, i, depth + 1);
+                dfs(depth + 1, i, bfs(i, infected));
             }
         }
     }
     
-    void bfs(int[] pipes) {
+    Set<Integer> bfs(int pipe, Set<Integer> infected) {
         Queue<Integer> q = new ArrayDeque<>();
-        boolean[] infected = new boolean[n + 1];
-        infected[start] = true;
         
-        int count = 1;
+        for (int i = 1; i <= n; i++) {
+            if (infected.contains(i)) q.offer(i);
+        }
         
-        for (int pipe : pipes) {
-            for (int i = 1; i <= n; i++) {
-                if (infected[i]) q.offer(i);
-            }
-            
-            while (!q.isEmpty()) {
-                int cur = q.poll();
-                
-                for (Edge e : graph.get(cur)) {
-                    if (e.type == pipe && !infected[e.to]) {
-                        q.offer(e.to);
-                        infected[e.to] = true;
-                        count++;
-                    }
+        Set<Integer> newInfected = new HashSet(infected);
+        
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+
+            for (Edge e : graph.get(cur)) {
+                if (e.type == pipe && !newInfected.contains(e.to)) {
+                    q.offer(e.to);
+                    newInfected.add(e.to);
                 }
             }
         }
         
-        ans = Math.max(ans, count);
+        return newInfected;
     }
     
     static class Edge {
