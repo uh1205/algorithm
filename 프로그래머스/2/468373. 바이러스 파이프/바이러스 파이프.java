@@ -35,7 +35,11 @@ class Solution {
         
         for (int i = 1; i <= 3; i++) {
             if (cur != i) {
-                dfs(depth + 1, i, bfs(i, infected));
+                Set<Integer> newInfected = bfs(i, infected);
+                
+                if (newInfected.size() == infected.size()) continue;
+                
+                dfs(depth + 1, i, newInfected);
             }
         }
     }
