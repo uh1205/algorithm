@@ -25,11 +25,10 @@ class Solution {
         }
     }
     
-    boolean isPrime(int x) {
-        if (x < 2) return false;
-        if (x == 2) return true;
-        for (int i = 2; i < x; i++) {
-            if (x % i == 0) return false;
+    boolean isPrime(int n) {
+        if (n < 2) return false;
+        for (int i = 2; i <= Math.sqrt(n); i++) {
+            if (n % i == 0) return false;
         }
         return true;
     }
