@@ -5,15 +5,16 @@ class Solution {
     List<String> words = new ArrayList<>();
     
     public int solution(String word) {
-        dfs("");
+        dfs(new StringBuilder());
         return words.indexOf(word);
     }
     
-    void dfs(String cur) {
-        words.add(cur);
-        if (cur.length() == 5) return;
+    void dfs(StringBuilder sb) {
+        words.add(sb.toString());
+        if (sb.length() == 5) return;
         for (int i = 0; i < 5; i++) {
-            dfs(cur + moeum[i]);
+            dfs(sb.append(moeum[i]));
+            sb.deleteCharAt(sb.length() - 1);
         }
     }
 }
