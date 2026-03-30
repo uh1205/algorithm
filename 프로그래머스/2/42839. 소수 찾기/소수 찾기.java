@@ -1,25 +1,27 @@
 import java.util.*;
 
 class Solution {
-    Set<Integer> ans = new HashSet<>();
+    Set<Integer> set = new HashSet<>();
     boolean[] visited;
     
     public int solution(String numbers) {
         visited = new boolean[numbers.length()];
-        dfs(numbers, 0, "");
-        return ans.size();
+        dfs("", numbers);
+        int ans = 0;
+        for (int v : set) {
+            if (isPrime(v)) ans++;
+        }
+        return ans;
     }
     
-    void dfs(String numbers, int depth, String val) {
+    void dfs(String cur, String numbers) {
+        if (!cur.equals("")) {
+            set.add(Integer.parseInt(cur));
+        }
         for (int i = 0; i < numbers.length(); i++) {
             if (!visited[i]) {
                 visited[i] = true;
-                String newVal = val + String.valueOf(numbers.charAt(i));
-                int num = Integer.parseInt(newVal);
-                if (!ans.contains(num) && isPrime(num)) {
-                    ans.add(num);
-                }
-                dfs(numbers, depth + 1, newVal);
+                dfs(cur + numbers.charAt(i), numbers);
                 visited[i] = false;
             }
         }
