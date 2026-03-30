@@ -2,33 +2,37 @@ import java.util.*;
 
 class Solution {
     List<List<Integer>> tree = new ArrayList<>();
+    int n;
+    int minDiff;
     
     public int solution(int n, int[][] wires) {
+        this.n = n;
+        minDiff = n;
+        
         for (int i = 0; i < n + 1; i++) {
             tree.add(new ArrayList<>());
         }
+        
         for (int[] wire : wires) {
             int a = wire[0];
             int b = wire[1];
             tree.get(a).add(b);
             tree.get(b).add(a);
         }
-        int minDiff = n;
-        for (int i = 0; i < n - 1; i++) {
-            int count = dfs(wires[i], new boolean[n + 1], 0, 1);
-            minDiff = Math.min(minDiff, Math.abs(n - 2 * count));
-        }
+        
+        dfs(1, 0);
+        
         return minDiff;
     }
     
-    int dfs(int[] del, boolean[] visited, int count, int cur) {
+    int dfs(int cur, int parent) {
+        int count = 1;
         for (int next : tree.get(cur)) {
-            if (cur == del[0] && next == del[1]) continue;
-            if (cur == del[1] && next == del[0]) continue;
-            
-            if (!visited[next]) {
-                visited[next] = true;
-                count = dfs(del, visited, count + 1, next);
+            if (next != parent) {
+                int childs = dfs(next, cur);
+                int diff = Math.abs(n - 2 * childs);
+                minDiff = Math.min(minDiff, diff);
+                count += childs;
             }
         }
         return count;
