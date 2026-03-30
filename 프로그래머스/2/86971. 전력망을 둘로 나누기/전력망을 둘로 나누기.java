@@ -30,9 +30,10 @@ class Solution {
         for (int next : tree.get(cur)) {
             if (next != parent) {
                 int childs = dfs(next, cur);
-                int diff = Math.abs(n - 2 * childs);
-                minDiff = Math.min(minDiff, diff);
                 count += childs;
+                
+                int diff = Math.abs(childs - (n - childs));
+                minDiff = Math.min(minDiff, diff);
             }
         }
         return count;
