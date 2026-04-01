@@ -12,8 +12,8 @@ public class Main {
 
         int[] arr = new int[N];
 
-        long low = 0; // 강의 중 최댓값
-        long high = 0; // 강의 총합
+        int low = 0; // 강의 중 최댓값
+        int high = 0; // 강의 총합
 
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
@@ -23,11 +23,11 @@ public class Main {
         }
 
         // 블루레이 크기를 mid로 설정했을 때, 필요한 블루레이 개수가 M개 이하인가?
-        long ans = high;
+        int ans = high;
 
         while (low <= high) {
-            long mid = (low + high) >>> 1;
-            
+            int mid = (low + high) >>> 1;
+
             int count = 1;
             long sum = 0;
 
