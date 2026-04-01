@@ -1,36 +1,35 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         int N = Integer.parseInt(st.nextToken());
-        int K = Integer.parseInt(st.nextToken());
+        long K = Long.parseLong(st.nextToken());
 
-        long[] S = new long[N + 1];
-
-        st = new StringTokenizer(br.readLine());
-        for (int i = 1; i <= N; i++) {
-            S[i] = S[i - 1] + Integer.parseInt(st.nextToken());
-        }
-
-        long ans = 0;
-
-        // S[i] - K가 이전에 몇번 등장?
+        // map: <누적합의 값, 해당 값이 나온 횟수>
         Map<Long, Long> map = new HashMap<>();
+        
+        // 초기값: 누적합이 0인 경우가 한 번 있다고 설정 (처음부터 현재까지의 합이 K인 경우 대비)
         map.put(0L, 1L);
 
-        for (int i = 1; i <= N; i++) {
-            long cur = S[i] - K;
-            if (map.containsKey(cur)) {
-                ans += map.get(cur);
+        long currentSum = 0;
+        long ans = 0;
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            currentSum += Long.parseLong(st.nextToken());
+
+            // 우리가 찾는 조건: currentSum - 이전누적합 = K
+            // 즉, 이전누적합 = currentSum - K
+            if (map.containsKey(currentSum - K)) {
+                ans += map.get(currentSum - K);
             }
-            map.put(S[i], map.getOrDefault(S[i], 0L) + 1);
+
+            // 현재 누적합을 맵에 업데이트
+            map.put(currentSum, map.getOrDefault(currentSum, 0L) + 1);
         }
 
         System.out.println(ans);
