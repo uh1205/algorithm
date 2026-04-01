@@ -10,32 +10,32 @@ public class Main {
         int N = Integer.parseInt(st.nextToken());
         int M = Integer.parseInt(st.nextToken());
 
-        int[] tree = new int[N];
+        int[] arr = new int[N];
 
         int low = 0;
         int high = 0;
 
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
-            tree[i] = Integer.parseInt(st.nextToken());
-            high = Math.max(high, tree[i]);
+            arr[i] = Integer.parseInt(st.nextToken());
+            high = Math.max(high, arr[i]);
         }
 
         // 높이를 mid로 설정했을 때, 얻은 나무가 M 이상인가?
-        // 이상이면 up, 미만이면 down
         int ans = 0;
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            long get = 0;
 
-            for (int t : tree) {
-                if (t > mid) {
-                    get += t - mid;
+            long sum = 0;
+
+            for (int a : arr) {
+                if (a > mid) {
+                    sum += a - mid;
                 }
             }
 
-            if (get >= M) {
+            if (sum >= M) {
                 ans = mid;
                 low = mid + 1;
             } else {
