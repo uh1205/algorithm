@@ -1,28 +1,38 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
 
-        int[] arr = new int[n + 1];
+        int[] arr = new int[n];
 
-        for (int i = 1; i <= n; i++) {
+        for (int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(br.readLine());
         }
 
-        int[] dp = new int[n + 1];
+        // 연속 3잔 마실 수 없음
+        // i번 포도주를 안 마신 경우, 마신 경우
+        int[][] dp = new int[n][2];
+        dp[0][1] = arr[0];
 
-        dp[1] = arr[1];
-        if (n >= 2) dp[2] = arr[1] + arr[2];
-
-        for (int i = 3; i <= n; i++) {
-            int a = arr[i] + arr[i - 1] + dp[i - 3];
-            int b = arr[i] + dp[i - 2];
-            int c = dp[i - 1];
-            dp[i] = Math.max(a, Math.max(b, c));
+        if (n > 1) {
+            dp[1][0] = arr[0];
+            dp[1][1] = arr[0] + arr[1];
         }
 
-        System.out.println(dp[n]);
+        // ..x = ..ox, ..xx
+        // ..o = ..xoo, ..xo
+        for (int i = 2; i < n; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1]);
+            dp[i][1] = arr[i] + Math.max(
+                    dp[i - 2][0] + arr[i - 1],
+                    dp[i - 1][0]
+            );
+        }
+
+        System.out.println(Math.max(dp[n - 1][0], dp[n - 1][1]));
     }
 }
