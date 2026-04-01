@@ -10,41 +10,30 @@ public class Main {
         int N = Integer.parseInt(st.nextToken());
         int M = Integer.parseInt(st.nextToken());
 
-        int[] arr = new int[N + 1];
-
+        int[] arr = new int[N];
+        
         st = new StringTokenizer(br.readLine());
-        for (int i = 1; i <= N; i++) {
+        for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        int[] pre = new int[N + 1];
-        pre[1] = arr[1];
-
-        for (int i = 2; i <= N; i++) {
-            pre[i] = pre[i - 1] + arr[i];
-        }
-
-        // i ~ j 구간합 = pre[j] - pre[i - 1]
         int ans = 0;
+        int left = 0;
+        int right = 0;
+        int sum = 0;
 
-        int left = 1;
-        int right = 1;
-
-        while (left <= N && right <= N) {
-            int sum = pre[right] - pre[left - 1];
-
-            if (sum < M) {
-                right++;
-            } else if (sum > M) {
-                left++;
+        while (true) {
+            if (sum >= M) {
+                sum -= arr[left++];
+            } else if (right == N) {
+                // 끝에 도달했는데 합이 M보다 작다면 더 이상 구할 수 없음
+                break;
             } else {
-                ans++;
-                left++;
-                right++;
+                sum += arr[right++];
             }
 
-            if (left > right) {
-                right = left;
+            if (sum == M) {
+                ans++;
             }
         }
 
