@@ -2,31 +2,18 @@ import java.util.*;
 
 class Solution {
     public int solution(int[][] routes) {
-        Arrays.sort(routes, (a, b) -> {
-            return a[0] - b[0];
-        });
+        Arrays.sort(routes, (a, b) -> a[1] - b[1]);
         
-        int ans = 1;
-        int left = Integer.MIN_VALUE;
-        int right = Integer.MAX_VALUE;
+        int ans = 0;
+        int last = Integer.MIN_VALUE;
         
         for (int[] r : routes) {
-            if (right >= r[0]) { // 겹침
-                left = r[0];
-                right = Math.min(right, r[1]);
-            } else {
+            if (last < r[0]) {
                 ans++;
-                left = r[0];
-                right = r[1];
+                last = r[1];
             }
         }
         
         return ans;
     }
 }
-// .     .
-//   . .
-
-// .  .
-//   .  .
-
