@@ -1,46 +1,48 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
 
-        int[] maxDp = new int[3];
-        int[] minDp = new int[3];
-
-        int[] tempMax = new int[3];
-        int[] tempMin = new int[3];
+        int[][] arr = new int[N][3];
 
         for (int i = 0; i < N; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            if (i == 0) {
-                maxDp[0] = minDp[0] = a;
-                maxDp[1] = minDp[1] = b;
-                maxDp[2] = minDp[2] = c;
-            } else {
-                tempMax[0] = Math.max(maxDp[0], maxDp[1]) + a;
-                tempMax[1] = Math.max(Math.max(maxDp[0], maxDp[1]), maxDp[2]) + b;
-                tempMax[2] = Math.max(maxDp[1], maxDp[2]) + c;
-
-                tempMin[0] = Math.min(minDp[0], minDp[1]) + a;
-                tempMin[1] = Math.min(Math.min(minDp[0], minDp[1]), minDp[2]) + b;
-                tempMin[2] = Math.min(minDp[1], minDp[2]) + c;
-
-                for (int j = 0; j < 3; j++) {
-                    maxDp[j] = tempMax[j];
-                    minDp[j] = tempMin[j];
-                }
+            for (int j = 0; j < 3; j++) {
+                arr[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        int maxScore = Math.max(Math.max(maxDp[0], maxDp[1]), maxDp[2]);
-        int minScore = Math.min(Math.min(minDp[0], minDp[1]), minDp[2]);
+        int[][] dp = new int[3][2];
+        dp[0][0] = dp[0][1] = arr[0][0];
+        dp[1][0] = dp[1][1] = arr[0][1];
+        dp[2][0] = dp[2][1] = arr[0][2];
 
-        System.out.println(maxScore + " " + minScore);
+        for (int i = 1; i < N; i++) {
+            int max0 = Math.max(dp[0][0], dp[1][0]);
+            int max1 = Math.max(dp[0][0], Math.max(dp[1][0], dp[2][0]));
+            int max2 = Math.max(dp[1][0], dp[2][0]);
+
+            int min0 = Math.min(dp[0][1], dp[1][1]);
+            int min1 = Math.min(dp[0][1], Math.min(dp[1][1], dp[2][1]));
+            int min2 = Math.min(dp[1][1], dp[2][1]);
+
+            dp[0][0] = arr[i][0] + max0;
+            dp[1][0] = arr[i][1] + max1;
+            dp[2][0] = arr[i][2] + max2;
+
+            dp[0][1] = arr[i][0] + min0;
+            dp[1][1] = arr[i][1] + min1;
+            dp[2][1] = arr[i][2] + min2;
+        }
+
+        int max = Math.max(dp[0][0], Math.max(dp[1][0], dp[2][0]));
+        int min = Math.min(dp[0][1], Math.min(dp[1][1], dp[2][1]));
+
+        System.out.println(max + " " + min);
     }
 }
