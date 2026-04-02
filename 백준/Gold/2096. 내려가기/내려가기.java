@@ -17,31 +17,28 @@ public class Main {
             }
         }
 
-        int[][] dp = new int[3][2];
-        dp[0][0] = dp[0][1] = arr[0][0];
-        dp[1][0] = dp[1][1] = arr[0][1];
-        dp[2][0] = dp[2][1] = arr[0][2];
+        int[] maxDp = new int[3];
+        int[] minDp = new int[3];
+
+        maxDp[0] = minDp[0] = arr[0][0];
+        maxDp[1] = minDp[1] = arr[0][1];
+        maxDp[2] = minDp[2] = arr[0][2];
 
         for (int i = 1; i < N; i++) {
-            int max0 = Math.max(dp[0][0], dp[1][0]);
-            int max1 = Math.max(dp[0][0], Math.max(dp[1][0], dp[2][0]));
-            int max2 = Math.max(dp[1][0], dp[2][0]);
+            int max0 = maxDp[0], max1 = maxDp[1], max2 = maxDp[2];
+            int min0 = minDp[0], min1 = minDp[1], min2 = minDp[2];
 
-            int min0 = Math.min(dp[0][1], dp[1][1]);
-            int min1 = Math.min(dp[0][1], Math.min(dp[1][1], dp[2][1]));
-            int min2 = Math.min(dp[1][1], dp[2][1]);
+            maxDp[0] = arr[i][0] + Math.max(max0, max1);
+            maxDp[1] = arr[i][1] + Math.max(max0, Math.max(max1, max2));
+            maxDp[2] = arr[i][2] + Math.max(max1, max2);
 
-            dp[0][0] = arr[i][0] + max0;
-            dp[1][0] = arr[i][1] + max1;
-            dp[2][0] = arr[i][2] + max2;
-
-            dp[0][1] = arr[i][0] + min0;
-            dp[1][1] = arr[i][1] + min1;
-            dp[2][1] = arr[i][2] + min2;
+            minDp[0] = arr[i][0] + Math.min(min0, min1);
+            minDp[1] = arr[i][1] + Math.min(min0, Math.min(min1, min2));
+            minDp[2] = arr[i][2] + Math.min(min1, min2);
         }
 
-        int max = Math.max(dp[0][0], Math.max(dp[1][0], dp[2][0]));
-        int min = Math.min(dp[0][1], Math.min(dp[1][1], dp[2][1]));
+        int max = Math.max(maxDp[0], Math.max(maxDp[1], maxDp[2]));
+        int min = Math.min(minDp[0], Math.min(minDp[1], minDp[2]));
 
         System.out.println(max + " " + min);
     }
