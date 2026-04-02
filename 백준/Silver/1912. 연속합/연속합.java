@@ -15,18 +15,14 @@ public class Main {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        // dp[i]: i번째 원소를 마지막으로 포함하는 연속합 중 최댓값
-        int[] dp = new int[n];
-        dp[0] = arr[0];
+        int sum = arr[0];
+        int ans = arr[0];
 
         for (int i = 1; i < n; i++) {
-            dp[i] = Math.max(dp[i - 1] + arr[i], arr[i]);
+            sum = Math.max(arr[i], sum + arr[i]);
+            ans = Math.max(ans, sum);
         }
 
-        int ans = Integer.MIN_VALUE;
-        for (int v : dp) {
-            ans = Math.max(ans, v);
-        }
         System.out.println(ans);
     }
 }
