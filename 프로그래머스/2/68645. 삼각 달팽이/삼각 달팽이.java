@@ -21,8 +21,7 @@ class Solution {
             }
         }
         
-        int size = n * (1 + n) / 2; // 등차수열 합
-        int[] ans = new int[size];
+        int[] ans = new int[num - 1];
         
         int idx = 0;
         for (int i = 0; i < n; i++) {
